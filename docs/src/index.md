@@ -6,7 +6,7 @@ The package is **not** registered in the General registry, but only in the [PC2R
 If you have subscribed to the latter, you can simply add the package as follows.
 
 ```
-] add GPUInspector.jl
+] add GPUInspector
 ```
 
 Otherwise, you can readily add it by using the explicit URL.

@@ -26,7 +26,7 @@
 ![Lifecycle](https://img.shields.io/badge/lifecycle-experimental-orange.svg)
 -->
 
-*Benchmarking high-performance multi-GPU nodes at PC2 with Julia*
+*Inspecting high-performance multi-GPU nodes at PC2 with Julia*
 
 | **Documentation**                                                               | **Build Status**                                                                                |  **Quality**                                                                                |
 |:-------------------------------------------------------------------------------:|:-----------------------------------------------------------------------------------------------:|:-----------------------------------------------------------------------------------------------:|
