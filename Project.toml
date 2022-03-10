@@ -1,0 +1,13 @@
+name = "GPUInspector"
+uuid = "608d808f-ff79-47b0-a25d-21f2c9b42853"
+authors = ["Carsten Bauer <carsten.bauer@uni-paderborn.de> and contributors"]
+version = "0.1.0"
+
+[compat]
+julia = "1.7"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
