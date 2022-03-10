@@ -12,7 +12,7 @@ If you have subscribed to the latter, you can simply add the package as follows.
 Otherwise, you can readily add it by using the explicit URL.
 
 ```
-] add https://git.uni-paderborn.de/pc2/julia/GPUInspector.jl
+] add https://github.com/pc2/GPUInspector.jl
 ```
 
 **Note:** The minimal required Julia version is 1.7.
