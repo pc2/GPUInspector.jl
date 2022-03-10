@@ -2,17 +2,10 @@
 
 ## Installation
 
-The package is **not** registered in the General registry, but only in the [PC2Registry](https://git.uni-paderborn.de/pc2/julia/PC2Registry).
-If you have subscribed to the latter, you can simply add the package as follows.
+The package is registered in the General registry and can readily be added by using the Pkg REPL mode.
 
 ```
 ] add GPUInspector
-```
-
-Otherwise, you can readily add it by using the explicit URL.
-
-```
-] add https://github.com/pc2/GPUInspector.jl
 ```
 
 **Note:** The minimal required Julia version is 1.7.

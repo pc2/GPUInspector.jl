@@ -34,10 +34,10 @@
 
 ## Installation
 
-The package isn't registered in the General registry, but you can readily add it by using the Pkg REPL mode.
+The package is registered in the General registry and can readily be added by using the Pkg REPL mode.
 
 ```
-] add https://github.com/pc2/GPUInspector.jl
+] add GPUInspector
 ```
 
 **Note:** The minimal required Julia version is 1.7.
