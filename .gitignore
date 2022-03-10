@@ -1,1 +1,10 @@
+docs/src/assets/themes/*.scss
+docs/src/assets/themes/*.css
+docs/Manifest.toml
 /Manifest.toml
+docs/Manifest.toml
+.DS_Store
+docs/build
+.envrc
+**/*.h5
+**/*.qdrep
