@@ -6,11 +6,11 @@
 [docs-stable-img]: https://img.shields.io/badge/docs-stable-blue.svg
 [docs-stable-url]: https://pc2.github.io/GPUInspector.jl/stable
 
-[ci-img]: https://git.uni-paderborn.de/pc2-ci/julia/GPUInspector.jl/badges/main/pipeline.svg?key_text=CI@PC2
-[ci-url]: https://git.uni-paderborn.de/pc2-ci/julia/GPUInspector.jl/-/pipelines
+[ci-img]: https://git.uni-paderborn.de/pc2-ci/julia/GPUInspector-jl/badges/main/pipeline.svg?key_text=CI@PC2
+[ci-url]: https://git.uni-paderborn.de/pc2-ci/julia/GPUInspector-jl/-/pipelines
 
-[cov-img]: https://git.uni-paderborn.de/pc2-ci/julia/GPUInspector.jl/badges/main/coverage.svg
-[cov-url]: https://git.uni-paderborn.de/pc2-ci/julia/GPUInspector.jl/-/commits/main
+[cov-img]: https://git.uni-paderborn.de/pc2-ci/julia/GPUInspector-jl/badges/main/coverage.svg
+[cov-url]: https://git.uni-paderborn.de/pc2-ci/julia/GPUInspector-jl/-/commits/main
 
 [lifecycle-img]: https://img.shields.io/badge/lifecycle-experimental-yellow.svg
 
