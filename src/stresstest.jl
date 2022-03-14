@@ -15,6 +15,7 @@ Choose one of the following (or none):
 
 General settings:
 * `dtype` (default: `Float32`): element type of the matrices
+* `monitoring` (default: `false`): enable automatic monitoring, in which case a [`MonitoringResults`](@ref) object is returned.
 * `size` (default: `2048`): matrices of size `(size, size)` will be used
 * `verbose` (default: `true`): toggle printing of information
 * `parallel` (default: `true`): If `true`, will (try to) run each GPU test on a different Julia thread. Make sure to have enough Julia threads.

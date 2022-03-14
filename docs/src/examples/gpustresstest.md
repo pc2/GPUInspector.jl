@@ -80,7 +80,7 @@ julia> results = monitoring_stop();
 [ Info: Stopping monitoring and fetching results...
 ```
 
-Here, `results` is a named tuple with time series information about GPU utilization, temperature, and more. See [`monitoring_stop`](@ref) for details.
+Here, `results` is a [`MonitoringResults`](@ref) object with time series information about GPU utilization, temperature, and more. See [`monitoring_stop`](@ref) for details.
 
 You can use [`save_monitoring_results`](@ref) to save the results on disk. We also provide [`plot_monitoring_results`](@ref) to visualize the results, which should give you an output like this.
 
@@ -150,3 +150,5 @@ julia> plot_monitoring_results(results)
              ⠀0⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀20⠀                              
              ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀Time [s]⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀                              
 ```
+
+Note that for convenience [`stresstest`](@ref) also takes a `monitoring` keyword argument which can be used to automatically trigger the starting and stopping of the monitoring.
