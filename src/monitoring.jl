@@ -144,19 +144,13 @@ function monitoring_stop(; verbose=true)::MonitoringResults
 end
 
 """
-    plot_monitoring_results(r::MonitoringResults, symbols=keys(r.results); tofile=false, ext=:pdf)
-Plot the quantities specified through `symbols` of a `MonitoringResults` object. If `tofile==false` (default), UnicodePlots.jl
-will be used to generate textual in-terminal / in-logfile plots. If `tofile==true`, CairoMakie.jl will be used to generate and save high-quality plots to disk.
+    plot_monitoring_results(r::MonitoringResults, symbols=keys(r.results))
+Plot the quantities specified through `symbols` of a `MonitoringResults` object.
+Will generate a textual in-terminal / in-logfile plot using UnicodePlots.jl.
 """
-function plot_monitoring_results(
-    r::MonitoringResults, symbols=keys(r.results); tofile=false, ext=:pdf
-)
+function plot_monitoring_results(r::MonitoringResults, symbols=keys(r.results))
     for s in symbols
-        if tofile
-            savefig_monitoring_results(r, s; ext)
-        else
-            display(plot_monitoring_results(r, s))
-        end
+        display(plot_monitoring_results(r, s))
     end
     return nothing
 end
@@ -182,29 +176,6 @@ function plot_monitoring_results(r::MonitoringResults, s::Symbol)
         UnicodePlots.lineplot!(p, times, getindex.(values, i); name=device_labels[i])
     end
     return p
-end
-
-function savefig_monitoring_results(r::MonitoringResults, s::Symbol; ext=:pdf)
-    times = r.times
-    values = r.results[s]
-    title, ylabel = _symbol2title_and_label(s)
-    ylims = _defaultylims(values)
-    device_labels = [str for (str, uuid) in r.devices]
-
-    f = CairoMakie.Figure(; resolution=(1000, 500))
-    ax =
-        f[1, 1] = CairoMakie.Axis(
-            f; xlabel="Time [s]", ylabel=ylabel, title=title, ylims=ylims
-        )
-    CairoMakie.scatterlines!(times, getindex.(values, 1); label=device_labels[1])
-    for i in 2:length(first(values))
-        CairoMakie.scatterlines!(times, getindex.(values, i); label=device_labels[i])
-    end
-    f[1, 2] = CairoMakie.Legend(f, ax, "Devices"; framevisible=false)
-    filename =
-        replace(lowercase(title), " " => "_", "(" => "", ")" => "") * "_plot.$(string(ext))"
-    CairoMakie.save(filename, f)
-    return nothing
 end
 
 """
@@ -348,4 +319,13 @@ function _symbol2title_and_label(s::Symbol)
     else
         return "", "Values"
     end
+end
+
+"""
+    savefig_monitoring_results(r::MonitoringResults, symbols=keys(r.results))
+Save plots of the quantities specified through `symbols` of a `MonitoringResults` object to disk.
+**Note:** Only available if CairoMakie.jl is loaded next to GPUInspector.jl.
+"""
+function savefig_monitoring_results(r::MonitoringResults, symbols=keys(r.results); ext=:pdf)
+    error("You need to load CairoMakie.jl first.")
 end
