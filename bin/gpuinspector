@@ -21,8 +21,39 @@ function main()
       println(context_string, "")
 
       theoretical_memory_bandwidth(dev, io=context_string)
+      println(context_string, "\n")
+      printstyled(context_string,"Measure memory bandwidth using memcopy\n", bold=true, color=:yellow)
       memory_bandwidth_scaling(device=dev, io=context_string)
       memory_bandwidth(device=dev, io=context_string)
+
+      println(context_string, "\n")
+      printstyled(context_string,"Measure memory bandwidth using saxpy\n", bold=true, color=:yellow)
+      memory_bandwidth_saxpy_scaling(device=dev, io=context_string)
+      memory_bandwidth_saxpy(device=dev, io=context_string)
+      println(context_string, "")
+      
+      printstyled(context_string,"Check host2device bandwidth\n\n", bold=true, color=:yellow)
+      device!(dev)
+      host2device_bandwidth(io=context_string)
+
+      println(context_string,"\n")
+      printstyled(context_string,"Check Peakflops\n\n", bold=true, color=:yellow)
+
+      theoretical_peakflops_gpu(; dtype=Float32, tensorcores=false, device=dev, io=context_string);
+      theoretical_peakflops_gpu(; dtype=Float64, tensorcores=false, device=dev, io=context_string);
+      println(context_string,"\n")
+
+      peakflops_gpu(; dtype=Float32, tensorcores=false, device=dev, io=context_string);
+      peakflops_gpu(; dtype=Float64, tensorcores=false, device=dev, io=context_string);
+      peakflops_gpu(; dtype=Float16, tensorcores=false, device=dev, io=context_string);
+
+      println(context_string,"\n")
+      theoretical_peakflops_gpu(; dtype=Int8, tensorcores=true, device=dev, io=context_string);
+      theoretical_peakflops_gpu(; dtype=Float16, tensorcores=true, device=dev, io=context_string);
+      theoretical_peakflops_gpu(; dtype=Float32, tensorcores=true, device=dev, io=context_string);
+      theoretical_peakflops_gpu(; dtype=Float64, tensorcores=true, device=dev, io=context_string);
+      println(context_string,"\n")
+      peakflops_gpu(; dtype=Float16, tensorcores=true, device=dev, io=context_string);
 
       my_string = String(take!(io_string))
       @info(my_string)

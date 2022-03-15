@@ -23,6 +23,7 @@ function host2device_bandwidth(
     dtype=Cchar,
     DtoDfactor=true,
     verbose=true,
+    io::IO=stdout,
     kwargs...,
 )
     N = Int(bytes(memsize) ÷ sizeof(dtype))
@@ -37,10 +38,10 @@ function host2device_bandwidth(
     #     println("GPU: ", gpu, " - ", name(gpu), "\n")
     # end
 
-    _perform_memcpy(mem_host, mem_gpu; title="Host <-> Device", verbose, kwargs...)
-    verbose && println()
+    _perform_memcpy(mem_host, mem_gpu; title="Host <-> Device", verbose, io=io, kwargs...)
+    verbose && println(io)
     _perform_memcpy(
-        mem_host_pinned, mem_gpu; title="Host (pinned) <-> Device", verbose, kwargs...
+        mem_host_pinned, mem_gpu; title="Host (pinned) <-> Device", verbose, io=io, kwargs...
     )
     # verbose && println()
     # _perform_memcpy(mem_gpu, mem_gpu2; title="Device <-> Device (same device)", DtoDfactor, verbose, kwargs...)
