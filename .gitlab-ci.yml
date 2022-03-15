@@ -1,10 +1,10 @@
 stages:
-  - testing
+  - testing-1.6
+  - testing-1.7
   - documentation
 
-# Generates code coverage
 julia/1.6:
-  stage: testing
+  stage: testing-1.6
   tags:
     - bauerc-noctua
   variables:
@@ -26,7 +26,7 @@ julia/1.6:
 
 # Generates code coverage
 julia/1.7:
-  stage: testing
+  stage: testing-1.7
   tags:
     - bauerc-noctua
   variables:
@@ -50,7 +50,7 @@ julia/1.7:
 
 
 # Documentation
-build-and-deploy:
+build-and-deploy-docs:
   stage: documentation
   tags:
     - bauerc-noctua

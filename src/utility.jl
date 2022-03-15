@@ -189,11 +189,6 @@ function logspace(start, stop, length)
     return exp2.(range(log2(start), log2(stop); length=length))
 end
 
-function pkgversion(pkgname::AbstractString)
-    key = findfirst(x -> x.name == pkgname, Pkg.dependencies())
-    if isnothing(key)
-        return nothing
-    else
-        return Pkg.dependencies()[key].version
-    end
+function pkgversion(pkg::Module)
+    return Pkg.Types.read_project(joinpath(Base.pkgdir(pkg), "Project.toml")).version
 end
