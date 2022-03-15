@@ -26,7 +26,7 @@
 ![Lifecycle](https://img.shields.io/badge/lifecycle-experimental-orange.svg)
 -->
 
-*Inspecting high-performance multi-GPU nodes at PC2 with Julia*
+*Inspecting high-performance multi-GPU nodes with Julia*
 
 | **Documentation**                                                               | **Build Status**                                                                                |  **Quality**                                                                                |
 |:-------------------------------------------------------------------------------:|:-----------------------------------------------------------------------------------------------:|:-----------------------------------------------------------------------------------------------:|
@@ -40,7 +40,7 @@ The package is registered in the General registry and can readily be added by us
 ] add GPUInspector
 ```
 
-**Note:** The minimal required Julia version is 1.7.
+**Note:** The minimal required Julia version is 1.6 but we strongly recommend to use Julia >= 1.7. Some features might not be available in Julia 1.6!
 
 ## Documentation
 

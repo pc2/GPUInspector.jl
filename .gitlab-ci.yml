@@ -1,10 +1,32 @@
 stages:
-  - test-1.7
+  - testing
   - documentation
 
 # Generates code coverage
+julia/1.6:
+  stage: testing
+  tags:
+    - bauerc-noctua
+  variables:
+    SCHEDULER_PARAMETERS: "-A pc2-mitarbeiter -p dgx -n 64 -t 00:15:00" # use 4 GPUs
+    JULIA_NUM_THREADS: "10"
+    JULIA_EXCLUSIVE: "1"
+    MKL_DYNAMIC: "false"
+    MKL_NUM_THREADS: "1"
+  only:
+    - main
+    # - pushes
+    # - tags
+    - merge_requests
+  script:
+    - /bin/bash -l
+    - module load CUDA/11.5.0
+    - module load Julia/1.6.5-linux-x86_64
+    - julia --color=yes --project=. -e 'using Pkg; Pkg.build(verbose=true); Pkg.test(; coverage = false);'
+
+# Generates code coverage
 julia/1.7:
-  stage: test-1.7
+  stage: testing
   tags:
     - bauerc-noctua
   variables:
@@ -40,8 +62,8 @@ build-and-deploy:
     MKL_NUM_THREADS: "1"
   only:
     - main
+    - tags
     # - pushes
-    # - tags
     # - merge_requests
   script:
     - /bin/bash -l

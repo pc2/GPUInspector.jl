@@ -23,7 +23,7 @@ function savefig_monitoring_results(r::MonitoringResults, s::Symbol; ext=:pdf)
     end
     f[1, 2] = CairoMakie.Legend(f, ax, "Devices"; framevisible=false)
     filename =
-        replace(lowercase(title), " " => "_", "(" => "", ")" => "") * "_plot.$(string(ext))"
+        replace(replace(replace(lowercase(title), " " => "_"), "(" => ""), ")" => "") * "_plot.$(string(ext))"
     CairoMakie.save(filename, f)
     return nothing
 end

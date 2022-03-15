@@ -7,6 +7,7 @@ using LinearAlgebra
 using Libdl
 using Distributed: addprocs, rmprocs, @everywhere, workers
 using Base: UUID
+using Pkg: Pkg
 
 # external
 using Requires

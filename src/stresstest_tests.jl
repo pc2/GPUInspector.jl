@@ -83,7 +83,7 @@ function (st::StressTestBatched)(; verbose=false)
         "Running StressTestBatched{$(_eltype(st))} on Julia thread $(Threads.threadid()) and $(st.device)."
     )
     counter = device!(st.device) do
-        (; C, A, B, duration, batchsize) = st # unpack
+        C, A, B, duration, batchsize = st.C, st.A, st.B, st.duration, st.batchsize
         event_halfbatch = CuEvent()
         i_record = Int(batchsize ÷ 2)
         counter = 0
@@ -143,7 +143,7 @@ function (st::StressTestEnforced)(; verbose=false)
     )
     counter = 0
     device!(st.device) do
-        (; C, A, B, enforced_duration) = st # unpack
+        C, A, B, enforced_duration = st.C, st.A, st.B, st.enforced_duration
         t = time()
         @inbounds while (time() - t) < enforced_duration
             CUDA.@sync mul!(C, A, B)
@@ -205,7 +205,7 @@ function (st::StressTestStoreResults)(; verbose=false)
         "Running StressTestStoreResults{$(_eltype(st))} on Julia thread $(Threads.threadid()) and $(st.device)."
     )
     device!(st.device) do
-        (; C, A, B, niters) = st # unpack
+        C, A, B, niters = st.C, st.A, st.B, st.niters
         @inbounds for i in 1:niters
             mul!(C[i], A, B)
         end
@@ -276,7 +276,7 @@ function (st::StressTestFixedIter)(; verbose=false)
         "Running StressTestFixedIter{$(_eltype(st))} on Julia thread $(Threads.threadid()) and $(st.device)."
     )
     device!(st.device) do
-        (; C, A, B, niter) = st # unpack
+        C, A, B, niter = st.C, st.A, st.B, st.niter
         CUDA.@sync @inbounds for _ in 1:niter
             mul!(C, A, B)
         end
