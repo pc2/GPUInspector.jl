@@ -9,6 +9,7 @@ julia/1.6:
     - bauerc-noctua
   variables:
     SCHEDULER_PARAMETERS: "-A pc2-mitarbeiter -p dgx -n 64 -t 00:15:00" # use 4 GPUs
+    JULIA_DEPOT_PATH: "/scratch/pc2-mitarbeiter/bauerc/.julia-ci"
     JULIA_NUM_THREADS: "10"
     JULIA_EXCLUSIVE: "1"
     MKL_DYNAMIC: "false"
@@ -32,6 +33,7 @@ julia/1.7:
     - bauerc-noctua
   variables:
     SCHEDULER_PARAMETERS: "-A pc2-mitarbeiter -p dgx -n 64 -t 00:15:00" # use 4 GPUs
+    JULIA_DEPOT_PATH: "/scratch/pc2-mitarbeiter/bauerc/.julia-ci"
     JULIA_NUM_THREADS: "10"
     JULIA_EXCLUSIVE: "1"
     MKL_DYNAMIC: "false"
@@ -58,6 +60,7 @@ build-and-deploy-docs:
     - bauerc-noctua
   variables:
     SCHEDULER_PARAMETERS: "-A pc2-mitarbeiter -p dgx -n 64 -t 00:15:00" # use 4 GPUs
+    JULIA_DEPOT_PATH: "/scratch/pc2-mitarbeiter/bauerc/.julia-ci"
     JULIA_NUM_THREADS: "10"
     JULIA_EXCLUSIVE: "1"
     MKL_DYNAMIC: "false"

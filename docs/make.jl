@@ -3,7 +3,6 @@ using Documenter
 using DocThemePC2
 using GPUInspector
 using LinearAlgebra
-using MKL # optional
 
 BLAS.set_num_threads(1)
 
