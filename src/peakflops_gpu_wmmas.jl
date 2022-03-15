@@ -75,7 +75,7 @@ it takes to perform `_kernel_wmma_nwmmas()` many WMMAs on Tensor Cores.
 
 **Keyword arguments:**
 * `device` (default: `CUDA.device()`): CUDA device to be used.
-* `dtype` (default: `Float16`): element type of the matrices. We currently only support `Float16`, `Int8` (`:TensorFloat32`, `:BFloat16`, and `Float64` might or might not work).
+* `dtype` (default: `Float16`): element type of the matrices. We currently only support `Float16` (`Int8`, `:TensorFloat32`, `:BFloat16`, and `Float64` might or might not work).
 * `nkernel` (default: `10`): number of kernel calls that make up one benchmarking sample.
 * `nbench` (default: `5`): number of measurements to be performed the best of which is used for the TFLOP/s computation.
 * `threads` (default: max. threads per block): how many threads to use per block (part of the kernel launch configuration).
@@ -101,7 +101,9 @@ function peakflops_gpu_wmmas(;
             dtype_a = dtype_b = Float16
             dtype_c = dtype_d = Float32
         elseif Symbol(dtype) == :Int8
-            # requires CUDA.jl >= 3.8.4
+            if pkgversion(CUDA) < v"3.8.6"
+                error("At the time of writing, CUDA#master is required for Int8 WMMA support.")
+            end
             m = n = k = 16
             dtype_a = dtype_b = Int8
             dtype_c = dtype_d = Int32

@@ -87,4 +87,10 @@ Peakflops (TFLOP/s):
  ├ tensorcores: true
  ├ dtype: Float16
  └ max: 311.2
+
+julia> peakflops_gpu(; dtype=:TensorFloat32, tensorcores=true); # as of writing, requires Julia 1.8 and https://github.com/JuliaGPU/CUDA.jl/pull/1419
+Peakflops (TFLOP/s):
+ ├ tensorcores: true
+ ├ dtype: TensorFloat32
+ └ max: 155.5
 ```
