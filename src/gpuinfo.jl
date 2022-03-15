@@ -5,11 +5,11 @@ Print out detailed information about the GPU with the given `deviceid`.
 
 Heavily inspired by the CUDA sample "deviceQueryDrv.cpp".
 """
-function gpuinfo(deviceid::Integer)
+function gpuinfo(deviceid::Integer; io::IO=stdout)
     0 <= deviceid <= ngpus() - 1 || throw(ArgumentError("Invalid device id."))
-    return gpuinfo(CuDevice(deviceid))
+    return gpuinfo(CuDevice(deviceid); io)
 end
-function gpuinfo(dev::CuDevice=CUDA.device())
+function gpuinfo(dev::CuDevice=CUDA.device(); io::IO=stdout)
     # query
     mp = nmultiprocessors(dev)
     cores = ncudacores(dev)
@@ -98,64 +98,65 @@ function gpuinfo(dev::CuDevice=CUDA.device())
     ]
 
     # printing
-    println("Device: ", name(dev), " ($dev)")
-    println("Total amount of global memory: ", Base.format_bytes(Int(CUDA.totalmem(dev))))
-    println("Number of CUDA cores: ", cores)
-    println("Number of multiprocessors: ", mp, " ($(cores ÷ mp) CUDA cores each)")
-    println("GPU max. clock rate: ", max_clock_rate, " MHz")
-    println("Memory clock rate: ", mem_clock_rate, " MHz")
-    println("Memory bus width: ", mem_bus_width, "-bit")
-    println("L2 cache size: ", Base.format_bytes(l2cachesize))
-    println("Max. texture dimension sizes (1D): $maxTex1D")
-    println("Max. texture dimension sizes (2D): $maxTex2D_width, $maxTex2D_height")
-    println(
+    println(io, "Device: ", name(dev), " ($dev)")
+    println(io, "Total amount of global memory: ", Base.format_bytes(Int(CUDA.totalmem(dev))))
+    println(io, "Number of CUDA cores: ", cores)
+    println(io, "Number of multiprocessors: ", mp, " ($(cores ÷ mp) CUDA cores each)")
+    println(io, "GPU max. clock rate: ", max_clock_rate, " MHz")
+    println(io, "Memory clock rate: ", mem_clock_rate, " MHz")
+    println(io, "Memory bus width: ", mem_bus_width, "-bit")
+    println(io, "L2 cache size: ", Base.format_bytes(l2cachesize))
+    println(io, "Max. texture dimension sizes (1D): $maxTex1D")
+    println(io, "Max. texture dimension sizes (2D): $maxTex2D_width, $maxTex2D_height")
+    println(io,
         "Max. texture dimension sizes (3D): $maxTex3D_width, $maxTex3D_height, $maxTex3D_depth",
     )
-    println(
+    println(io,
         "Max. layered 1D texture size: $(maxTex1DLayered_width) ($(maxTex1DLayered_layers) layers)",
     )
-    println(
+    println(io,
         "Max. layered 2D texture size: $(maxTex2DLayered_width), $(maxTex2DLayered_height) ($(maxTex2DLayered_layers) layers)",
     )
-    println("Total amount of constant memory: ", Base.format_bytes(total_constant_mem))
-    println(
+    println(io, "Total amount of constant memory: ", Base.format_bytes(total_constant_mem))
+    println(io,
         "Total amount of shared memory per block: ", Base.format_bytes(shared_mem_per_block)
     )
-    println("Total number of registers available per block: ", regs_per_block)
-    println("Warp size: ", warpsize)
-    println("Max. number of threads per multiprocessor: ", max_threads_per_mp)
-    println("Max. number of threads per block: ", max_threads_per_block)
-    println(
+    println(io, "Total number of registers available per block: ", regs_per_block)
+    println(io, "Warp size: ", warpsize)
+    println(io, "Max. number of threads per multiprocessor: ", max_threads_per_mp)
+    println(io, "Max. number of threads per block: ", max_threads_per_block)
+    println(io,
         "Max. dimension size of a thread block (x,y,z): $(blockdim_x), $(blockdim_y), $(blockdim_z)",
     )
-    println(
+    println(io,
         "Max. dimension size of a grid size (x,y,z): $(griddim_x), $(griddim_y), $(griddim_z)",
     )
-    println("Texture alignment: ", Base.format_bytes(texture_align))
-    println("Maximum memory pitch: ", Base.format_bytes(max_mem_pitch))
-    println(
+    println(io, "Texture alignment: ", Base.format_bytes(texture_align))
+    println(io, "Maximum memory pitch: ", Base.format_bytes(max_mem_pitch))
+    println(io,
         "Concurrent copy and kernel execution: ",
         gpu_overlap ? "Yes" : "No",
         " with $(async_engine_count) copy engine(s)",
     )
-    println("Run time limit on kernels: ", kernel_exec_timeout_enabled ? "Yes" : "No")
-    println("Integrated GPU sharing host memory: ", integrated ? "Yes" : "No")
-    println("Support host page-locked memory mapping: ", can_map_host_mem ? "Yes" : "No")
-    println("Concurrent kernel execution: ", concurrent_kernels ? "Yes" : "No")
-    println("Alignment requirement for surfaces: ", surface_alignment ? "Yes" : "No")
-    println("Device has ECC support: ", ecc_enabled ? "Yes" : "No")
-    println("Device supports Unified Addressing (UVA): ", unified_addressing ? "Yes" : "No")
-    println("Device supports managed memory: ", managed_memory ? "Yes" : "No")
-    println("Device supports compute preemption: ", compute_preemption ? "Yes" : "No")
-    println("Supports cooperative kernel launch: ", cooperative_launch ? "Yes" : "No")
-    println(
+    println(io, "Run time limit on kernels: ", kernel_exec_timeout_enabled ? "Yes" : "No")
+    println(io, "Integrated GPU sharing host memory: ", integrated ? "Yes" : "No")
+    println(io, "Support host page-locked memory mapping: ", can_map_host_mem ? "Yes" : "No")
+    println(io, "Concurrent kernel execution: ", concurrent_kernels ? "Yes" : "No")
+    println(io, "Alignment requirement for surfaces: ", surface_alignment ? "Yes" : "No")
+    println(io, "Device has ECC support: ", ecc_enabled ? "Yes" : "No")
+    println(io, "Device supports Unified Addressing (UVA): ", unified_addressing ? "Yes" : "No")
+    println(io, "Device supports managed memory: ", managed_memory ? "Yes" : "No")
+    println(io, "Device supports compute preemption: ", compute_preemption ? "Yes" : "No")
+    println(io, "Supports cooperative kernel launch: ", cooperative_launch ? "Yes" : "No")
+    println(io,
         "Supports multi-device co-op kernel launch: ",
         cooperative_multi_dev_launch ? "Yes" : "No",
     )
-    println(
+    println(io,
         "Device PCI domain ID / bus ID / device ID: $(pci_domainid) / $(pci_busid) / $(pci_deviceid)",
     )
-    println("Compute mode: ", comp_modes[compute_mode + 1])
+    println(io, "Compute mode: ", comp_modes[compute_mode + 1])
+    
     return nothing
 end
 

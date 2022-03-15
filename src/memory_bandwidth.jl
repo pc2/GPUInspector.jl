@@ -2,16 +2,16 @@
     theoretical_memory_bandwidth(; device::CuDevice=CUDA.device(); verbose=true)
 Estimates the theoretical maximal GPU memory bandwidth in GiB/s.
 """
-function theoretical_memory_bandwidth(dev::CuDevice=CUDA.device(); verbose=true)
+function theoretical_memory_bandwidth(dev::CuDevice=CUDA.device(); verbose=true, io::IO=stdout)
     max_mem_clock_rate =
         CUDA.attribute(dev, CUDA.CU_DEVICE_ATTRIBUTE_MEMORY_CLOCK_RATE) * 1000 # in Hz
     max_mem_bus_width =
         CUDA.attribute(dev, CUDA.CU_DEVICE_ATTRIBUTE_GLOBAL_MEMORY_BUS_WIDTH) / 8.0 # in bytes
     max_bw = 2.0 * max_mem_clock_rate * max_mem_bus_width * 2^(-30)
     if verbose
-        printstyled("Theoretical Maximal Memory Bandwidth (GiB/s):\n"; bold=true)
-        print(" └ max: ")
-        printstyled(round(max_bw; digits=1), "\n"; color=:green, bold=true)
+        printstyled(io, "Theoretical Maximal Memory Bandwidth (GiB/s):\n"; bold=true)
+        print(io, " └ max: ")
+        printstyled(io, round(max_bw; digits=1), "\n"; color=:green, bold=true)
     end
     return max_bw
 end
@@ -33,7 +33,8 @@ function memory_bandwidth(
     dtype=Cchar,
     verbose=true,
     DtoDfactor=true,
-    device=CUDA.device(),
+    device=CUDA.device(), 
+    io::IO=stdout,
     kwargs...,
 )
     device!(device) do
@@ -48,7 +49,7 @@ function memory_bandwidth(
         # end
 
         return _perform_memcpy(
-            mem_gpu, mem_gpu2; title="Memory", DtoDfactor, verbose, kwargs...
+            mem_gpu, mem_gpu2; title="Memory", DtoDfactor, verbose, io=io, kwargs...
         )
     end
 end
@@ -60,7 +61,7 @@ If `verbose=true` (default), displays a unicode plot. Returns the considered dat
 For further options, see [`memory_bandwidth`](@ref).
 """
 function memory_bandwidth_scaling(;
-    device=CUDA.device(), sizes=logspace(1, exp2(30), 10), verbose=true, kwargs...
+    device=CUDA.device(), sizes=logspace(1, exp2(30), 10), verbose=true, io::IO=stdout, kwargs...
 )
     bandwidths = zeros(length(sizes))
     for (i, s) in enumerate(sizes)
@@ -81,9 +82,9 @@ function memory_bandwidth_scaling(;
             xscale=:log2,
         )
         UnicodePlots.lineplot!(p, [peak_size, peak_size], [0.0, peak_val]; color=:red)
-        println() # top margin
-        display(p)
-        println() # bottom margin
+        println(io) # top margin
+        println(io,p)
+        println(io) # bottom margin
     end
     return sizes, bandwidths
 end

@@ -1,0 +1,31 @@
+#!/bin/sh
+#=
+exec julia --project=../ -O3 "$0" -- $@
+=#
+import Pkg
+Pkg.instantiate()
+using GPUInspector
+using Logging
+
+function main()
+  io = open("log.txt", "w+")
+  logger = SimpleLogger(io)
+  devs = collect(CUDA.devices())
+  
+  io_string = IOBuffer()
+  context_string = IOContext(io_string, :color => true)
+  for dev in devs
+
+      printstyled(context_string, "Inspecting device $dev\n\n"; bold=true, color=:blue)
+      gpuinfo(dev; io=context_string)
+      println(context_string, "")
+
+      theoretical_memory_bandwidth(dev, io=context_string)
+      memory_bandwidth_scaling(device=dev, io=context_string)
+      memory_bandwidth(device=dev, io=context_string)
+
+      my_string = String(take!(io_string))
+      @info(my_string)
+      println("\n")
+  end
+end
