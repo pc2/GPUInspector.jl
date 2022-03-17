@@ -8,55 +8,80 @@ using GPUInspector
 using Logging
 
 function main()
-  io = open("log.txt", "w+")
-  logger = SimpleLogger(io)
   devs = collect(CUDA.devices())
   
   io_string = IOBuffer()
   context_string = IOContext(io_string, :color => true)
   for dev in devs
+      io_file = open("device_$(dev.handle).log", "w+")
+      logger = SimpleLogger(io_file)
 
-      printstyled(context_string, "Inspecting device $dev\n\n"; bold=true, color=:blue)
+      printstyled(context_string, "Capabilities of device $dev\n\n"; bold=true, color=:cyan)
       gpuinfo(dev; io=context_string)
-      println(context_string, "")
-
-      theoretical_memory_bandwidth(dev, io=context_string)
-      println(context_string, "\n")
-      printstyled(context_string,"Measure memory bandwidth using memcopy\n", bold=true, color=:yellow)
-      memory_bandwidth_scaling(device=dev, io=context_string)
-      memory_bandwidth(device=dev, io=context_string)
-
-      println(context_string, "\n")
-      printstyled(context_string,"Measure memory bandwidth using saxpy\n", bold=true, color=:yellow)
-      memory_bandwidth_saxpy_scaling(device=dev, io=context_string)
-      memory_bandwidth_saxpy(device=dev, io=context_string)
-      println(context_string, "")
       
-      printstyled(context_string,"Check host2device bandwidth\n\n", bold=true, color=:yellow)
+      @info(String(take!(io_string)))
+      println("")
+
+      printstyled(context_string,"Check host2device bandwidth of device $dev\n\n", bold=true, color=:cyan)
       device!(dev)
       host2device_bandwidth(io=context_string)
+      @info(String(take!(io_string)))
 
-      println(context_string,"\n")
-      printstyled(context_string,"Check Peakflops\n\n", bold=true, color=:yellow)
+      println("")
+      printstyled(context_string,"Measure memory bandwidth of device $dev using memcopy\n\n", bold=true, color=:cyan)
+      memory_bandwidth_scaling(device=dev, io=context_string)
+      println(context_string,"")
+      val_theory = theoretical_memory_bandwidth(dev, io=context_string)
+      println(context_string, "")
+      val_measured = memory_bandwidth(device=dev, io=context_string)
+      percentage = round(val_measured/val_theory*100; digits=2)
+      println(context_string, "\nAchieved ", percentage, "% of theoretical bandwidth.")
+      
+      @info(String(take!(io_string)))
 
-      theoretical_peakflops_gpu(; dtype=Float32, tensorcores=false, device=dev, io=context_string);
-      theoretical_peakflops_gpu(; dtype=Float64, tensorcores=false, device=dev, io=context_string);
-      println(context_string,"\n")
+      println("")
+      printstyled(context_string,"Measure memory bandwidth of device $dev using saxpy\n\n", bold=true, color=:cyan)
+      memory_bandwidth_saxpy_scaling(device=dev, io=context_string)
+      val_theory = theoretical_memory_bandwidth(dev, io=context_string)
+      println(context_string, "")
+      val_measured= memory_bandwidth_saxpy(device=dev, io=context_string)
+      percentage = round(val_measured/val_theory*100; digits=2)
+      println(context_string, "\nAchieved ", percentage, "% of theoretical bandwidth.")
+      @info(String(take!(io_string)))
+      
+      println("")
+      printstyled(context_string,"Check Peakflops with Float32 on CUDA Cores of device $dev\n\n", bold=true, color=:cyan)
+      val_theory = theoretical_peakflops_gpu(; dtype=Float32, tensorcores=false, device=dev, io=context_string);
+      println(context_string, "")
+      val_measured = peakflops_gpu(; dtype=Float32, tensorcores=false, device=dev, io=context_string);
+      percentage = round(val_measured/val_theory*100; digits=2)
+      println(context_string, "\nAchieved ", percentage, "% of theoretical peakflops.")
+      @info(String(take!(io_string)))
+      println("")
+      
+      printstyled(context_string,"Check Peakflops with Float64 on CUDA Cores of device $dev\n\n", bold=true, color=:cyan)
+      val_theory = theoretical_peakflops_gpu(; dtype=Float64, tensorcores=false, device=dev, io=context_string);
+      println(context_string, "")
+      val_measured = peakflops_gpu(; dtype=Float64, tensorcores=false, device=dev, io=context_string);
+      percentage = round(val_measured/val_theory*100; digits=2)
+      println(context_string, "\nAchieved ", percentage, "% of theoretical peakflops.")
+      @info(String(take!(io_string)))
+      println("")
 
-      peakflops_gpu(; dtype=Float32, tensorcores=false, device=dev, io=context_string);
-      peakflops_gpu(; dtype=Float64, tensorcores=false, device=dev, io=context_string);
-      peakflops_gpu(; dtype=Float16, tensorcores=false, device=dev, io=context_string);
+      printstyled(context_string,"Check Peakflops with Float16 on Tensor Cores of device $dev\n\n", bold=true, color=:cyan)
+      val_theory = theoretical_peakflops_gpu(; dtype=Float16, tensorcores=true, device=dev, io=context_string);
+      println(context_string, "")
+      val_measured = peakflops_gpu(; dtype=Float16, tensorcores=true, device=dev, io=context_string);
+      percentage = round(val_measured/val_theory*100; digits=2)
+      println(context_string, "\nAchieved ", percentage, "% of theoretical peakflops.")
+      @info(String(take!(io_string)))
+      println("\n\n\n")
 
-      println(context_string,"\n")
-      theoretical_peakflops_gpu(; dtype=Int8, tensorcores=true, device=dev, io=context_string);
-      theoretical_peakflops_gpu(; dtype=Float16, tensorcores=true, device=dev, io=context_string);
-      theoretical_peakflops_gpu(; dtype=Float32, tensorcores=true, device=dev, io=context_string);
-      theoretical_peakflops_gpu(; dtype=Float64, tensorcores=true, device=dev, io=context_string);
-      println(context_string,"\n")
-      peakflops_gpu(; dtype=Float16, tensorcores=true, device=dev, io=context_string);
-
-      my_string = String(take!(io_string))
-      @info(my_string)
-      println("\n")
+      
+      # Not fully supported yet
+      #peakflops_gpu(; dtype=Float16, tensorcores=false, device=dev, io=context_string);
+      #theoretical_peakflops_gpu(; dtype=Int8, tensorcores=true, device=dev, io=context_string);
+      #theoretical_peakflops_gpu(; dtype=Float32, tensorcores=true, device=dev, io=context_string);
+      #theoretical_peakflops_gpu(; dtype=Float64, tensorcores=true, device=dev, io=context_string);
   end
 end
