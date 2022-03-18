@@ -41,7 +41,8 @@ function p2p_bandwidth(
     alternate=false,
     dtype=Float32,
     src=0,
-    dst=1,
+    dst=1, 
+    io::IO=stdout
 )
     mem_src, mem_dst = alloc_mem(memsize; devs=(src, dst), dtype)
     actual_memsize = sizeof(mem_src)
@@ -74,21 +75,22 @@ function p2p_bandwidth(
     bw_avg = mean(bws)
 
     if verbose
+        println("blaa;")
         # println("Memsize: $(Base.format_bytes(actual_memsize))\n")
         if times
-            println("t_min: $t_min")
-            println("t_max: $t_max")
-            println("t_avg: $t_avg")
+            println(io,"t_min: $t_min")
+            println(io,"t_max: $t_max")
+            println(io,"t_avg: $t_avg")
         end
-        printstyled("Bandwidth (GiB/s):\n"; bold=true)
-        print(" ├ max: ")
-        printstyled(round(bw_max; digits=2), "\n"; color=:green, bold=true)
-        println(" ├ min: ", round(bw_min; digits=2))
-        println(" ├ avg: ", round(bw_avg; digits=2))
-        print(" └ std_dev: ")
-        printstyled(round(std(bws); digits=2), "\n"; color=:yellow, bold=true)
+        printstyled(io,"Bandwidth (GiB/s):\n"; bold=true)
+        print(io," ├ max: ")
+        printstyled(io,round(bw_max; digits=2), "\n"; color=:green, bold=true)
+        println(io," ├ min: ", round(bw_min; digits=2))
+        println(io," ├ avg: ", round(bw_avg; digits=2))
+        print(io," └ std_dev: ")
+        printstyled(io,round(std(bws); digits=2), "\n"; color=:yellow, bold=true)
         if hist
-            display(UnicodePlots.histogram(bws; title="Bandwidths (GiB/s)", nbins=5))
+            println(io,UnicodePlots.histogram(bws; title="Bandwidths (GiB/s)", nbins=5))
         end
     end
 
@@ -101,13 +103,13 @@ end
 Run [`p2p_bandwidth`](@ref) for all combinations of devices.
 Returns a matrix with the p2p memory bandwidth estimates.
 """
-function p2p_bandwidth_all(args...; kwargs...)
+function p2p_bandwidth_all(args...;io::IO=stdout, verbose=false, kwargs...)
     ngpus = length(CUDA.devices())
     return [
         if src == dst
             nothing
         else
-            p2p_bandwidth(args...; src=src, dst=dst, verbose=false, kwargs...)
+            p2p_bandwidth(args...; src=src, dst=dst, io=io, verbose=verbose, kwargs...)
         end for src in 0:(ngpus - 1), dst in 0:(ngpus - 1)
     ]
 end
@@ -144,7 +146,8 @@ function p2p_bandwidth_bidirectional(
     dtype=Float32,
     dev1=0,
     dev2=1,
-    repeat=100,
+    repeat=100, 
+    io::IO=stdout
 )
     mem_dev1, mem_dev2 = alloc_mem(memsize; dtype, devs=(dev1, dev2))
     actual_memsize = sizeof(mem_dev1)
@@ -171,19 +174,19 @@ function p2p_bandwidth_bidirectional(
     if verbose
         # println("Memsize: $(Base.format_bytes(actual_memsize))\n")
         if times
-            println("t_min: $t_min")
-            println("t_max: $t_max")
-            println("t_avg: $t_avg")
+            println(io,"t_min: $t_min")
+            println(io,"t_max: $t_max")
+            println(io,"t_avg: $t_avg")
         end
-        printstyled("Bandwidth (GiB/s):\n"; bold=true)
-        print(" ├ max: ")
-        printstyled(round(bw_max; digits=2), "\n"; color=:green, bold=true)
-        println(" ├ min: ", round(bw_min; digits=2))
-        println(" ├ avg: ", round(bw_avg; digits=2))
-        print(" └ std_dev: ")
-        printstyled(round(std(bws); digits=2), "\n"; color=:yellow, bold=true)
+        printstyled(io,"Bandwidth (GiB/s):\n"; bold=true)
+        print(io," ├ max: ")
+        printstyled(io,round(bw_max; digits=2), "\n"; color=:green, bold=true)
+        println(io," ├ min: ", round(bw_min; digits=2))
+        println(io," ├ avg: ", round(bw_avg; digits=2))
+        print(io," └ std_dev: ")
+        printstyled(io,round(std(bws); digits=2), "\n"; color=:yellow, bold=true)
         if hist
-            display(UnicodePlots.histogram(bws; title="Bandwidths (GiB/s)", nbins=5))
+            println(io,UnicodePlots.histogram(bws; title="Bandwidths (GiB/s)", nbins=5))
         end
     end
 

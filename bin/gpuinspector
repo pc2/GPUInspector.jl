@@ -10,15 +10,15 @@ using Logging
 struct MultiLogger
     normal_io::IO
     error_io::IO
-    normal_logger::Base.CoreLogging.SimpleLogger
-    error_logger::Base.CoreLogging.SimpleLogger
+    normal_logger::ConsoleLogger
+    error_logger::ConsoleLogger
     
     function MultiLogger(normal_file_name::String, error_file_name::String)
         normal_io = open(normal_file_name, "w+")
-        normal_logger = SimpleLogger(normal_io)
+        normal_logger = ConsoleLogger(normal_io)
 
         error_io = open(error_file_name, "w+")
-        error_logger = SimpleLogger(error_io)
+        error_logger = ConsoleLogger(error_io)
 
         new(normal_io, error_io, normal_logger, error_logger)
     end
@@ -49,68 +49,104 @@ end
 function main()
   devs = collect(CUDA.devices())
   
-  io_string = IOBuffer()
-  context_string = IOContext(io_string, :color => true)
+  io = IOBuffer()
+  io_context = IOContext(io, :color => true)
+
   for dev in devs
       multilogger = MultiLogger("device_$(dev.handle).log","device_$(dev.handle).err")     
 
-      printstyled(context_string, "Capabilities of device $dev\n\n"; bold=true, color=:cyan)
-      gpuinfo(dev; io=context_string)
-      log(multilogger,String(take!(io_string)))
+      printstyled(io_context, "Capabilities of device $dev\n\n"; bold=true, color=:cyan)
+      gpuinfo(dev; io=io_context)
+      log(multilogger,String(take!(io)))
 
-      printstyled(context_string,"Check host2device bandwidth of device $dev\n\n", bold=true, color=:cyan)
+      printstyled(io_context,"Check host2device bandwidth of device $dev\n\n", 
+                  bold=true, color=:cyan)
       device!(dev)
-      host2device_bandwidth(io=context_string)
-      log(multilogger,String(take!(io_string)))
+      host2device_bandwidth(io=io_context)
+      log(multilogger,String(take!(io)))
 
-      printstyled(context_string,"Measure memory bandwidth of device $dev using memcopy\n\n", bold=true, color=:cyan)
-      val_theory = theoretical_memory_bandwidth(dev, io=context_string)
-      println(context_string, "")
-      _, bandwiths = memory_bandwidth_scaling(device=dev, sizes=logspace(1, exp2(30), 10), io=context_string)
+      printstyled(io_context,"Measure memory bandwidth of device $dev using memcopy\n\n", 
+                  bold=true, color=:cyan)
+      val_theory = theoretical_memory_bandwidth(dev, io=io_context)
+      println(io_context, "")
+      _, bandwiths = memory_bandwidth_scaling(device=dev, sizes=logspace(1, exp2(30), 10), 
+                                              io=io_context)
       val_measured,_ = findmax(bandwiths)
-      println(context_string,"")
+      println(io_context,"")
       percentage = round(val_measured/val_theory*100; digits=2)
-      println(context_string, "\nAchieved ", percentage, "% of theoretical bandwidth.")
-      log(multilogger,String(take!(io_string)), percentage < 80)
+      println(io_context, "\nAchieved ", percentage, "% of theoretical bandwidth.")
+      log(multilogger,String(take!(io)), percentage < 80)
 
-      printstyled(context_string,"Measure memory bandwidth of device $dev using saxpy\n\n", bold=true, color=:cyan)
-      val_theory = theoretical_memory_bandwidth(dev, io=context_string)
-      println(context_string, "")
-      _, bandwidths = memory_bandwidth_saxpy_scaling(device=dev, sizes=[2^20 * i for i in 10:10:300], io=context_string)
+      printstyled(io_context,"Measure memory bandwidth of device $dev using saxpy\n\n", 
+                    bold=true, color=:cyan)
+      val_theory = theoretical_memory_bandwidth(dev, io=io_context)
+      println(io_context, "")
+      _, bandwidths = memory_bandwidth_saxpy_scaling(device=dev, 
+                                        sizes=[2^20 * i for i in 10:10:300], io=io_context)
       val_measured,_ = findmax(bandwiths)
       percentage = round(val_measured/val_theory*100; digits=2)
-      println(context_string, "\nAchieved ", percentage, "% of theoretical bandwidth.")
-      log(multilogger,String(take!(io_string)), percentage < 80)
+      println(io_context, "\nAchieved ", percentage, "% of theoretical bandwidth.")
+      log(multilogger,String(take!(io)), percentage < 80)
       
-      printstyled(context_string,"Check Peakflops with Float32 on CUDA Cores of device $dev\n\n", bold=true, color=:cyan)
-      val_theory = theoretical_peakflops_gpu(; dtype=Float32, tensorcores=false, device=dev, io=context_string);
-      println(context_string, "")
-      val_measured = peakflops_gpu(; dtype=Float32, tensorcores=false, device=dev, io=context_string);
+      printstyled(io_context,"Check Peakflops with Float32 on CUDA Cores of device $dev\n\n", 
+                      bold=true, color=:cyan)
+      val_theory = theoretical_peakflops_gpu(; dtype=Float32, tensorcores=false, device=dev, 
+                                              io=io_context);
+      println(io_context, "")
+      val_measured = peakflops_gpu(; dtype=Float32, tensorcores=false, device=dev, 
+                                      io=io_context);
       percentage = round(val_measured/val_theory*100; digits=2)
-      println(context_string, "\nAchieved ", percentage, "% of theoretical peakflops.")
-      log(multilogger,String(take!(io_string)), percentage < 95)
+      println(io_context, "\nAchieved ", percentage, "% of theoretical peakflops.")
+      log(multilogger,String(take!(io)), percentage < 95)
       
-      printstyled(context_string,"Check Peakflops with Float64 on CUDA Cores of device $dev\n\n", bold=true, color=:cyan)
-      val_theory = theoretical_peakflops_gpu(; dtype=Float64, tensorcores=false, device=dev, io=context_string);
-      println(context_string, "")
-      val_measured = peakflops_gpu(; dtype=Float64, tensorcores=false, device=dev, io=context_string);
+      printstyled(io_context,"Check Peakflops with Float64 on CUDA Cores of device $dev\n\n",
+                          bold=true, color=:cyan)
+      val_theory = theoretical_peakflops_gpu(; dtype=Float64, tensorcores=false, device=dev, 
+                                              io=io_context);
+      println(io_context, "")
+      val_measured = peakflops_gpu(; dtype=Float64, tensorcores=false, device=dev, 
+                                        io=io_context);
       percentage = round(val_measured/val_theory*100; digits=2)
-      println(context_string, "\nAchieved ", percentage, "% of theoretical peakflops.")
-      log(multilogger,String(take!(io_string)), percentage < 95)
+      println(io_context, "\nAchieved ", percentage, "% of theoretical peakflops.")
+      log(multilogger,String(take!(io)), percentage < 95)
 
-      printstyled(context_string,"Check Peakflops with Float16 on Tensor Cores of device $dev\n\n", bold=true, color=:cyan)
-      val_theory = theoretical_peakflops_gpu(; dtype=Float16, tensorcores=true, device=dev, io=context_string);
-      println(context_string, "")
-      val_measured = peakflops_gpu(; dtype=Float16, tensorcores=true, device=dev, io=context_string);
+      printstyled(io_context,"Check Peakflops with Float16 on Tensor Cores of device $dev\n\n",
+                             bold=true, color=:cyan)
+      val_theory = theoretical_peakflops_gpu(; dtype=Float16, tensorcores=true, device=dev, 
+                                                  io=io_context);
+      println(io_context, "")
+      val_measured = peakflops_gpu(; dtype=Float16, tensorcores=true, device=dev, io=io_context);
       percentage = round(val_measured/val_theory*100; digits=2)
-      println(context_string, "\nAchieved ", percentage, "% of theoretical peakflops.")
-      log(multilogger,String(take!(io_string)), percentage < 95)
+      println(io_context, "\nAchieved ", percentage, "% of theoretical peakflops.")
+      log(multilogger,String(take!(io)), percentage < 95)
       println("\n\n\n")
 
       # Not fully supported yet
-      #peakflops_gpu(; dtype=Float16, tensorcores=false, device=dev, io=context_string);
-      #theoretical_peakflops_gpu(; dtype=Int8, tensorcores=true, device=dev, io=context_string);
-      #theoretical_peakflops_gpu(; dtype=Float32, tensorcores=true, device=dev, io=context_string);
-      #theoretical_peakflops_gpu(; dtype=Float64, tensorcores=true, device=dev, io=context_string);
+      #peakflops_gpu(; dtype=Float16, tensorcores=false, device=dev, io=io_context);
+      #theoretical_peakflops_gpu(; dtype=Int8, tensorcores=true, device=dev, io=io_context);
+      #theoretical_peakflops_gpu(; dtype=Float32, tensorcores=true, device=dev, io=io_context);
+      #theoretical_peakflops_gpu(; dtype=Float64, tensorcores=true, device=dev, io=io_context);
   end
+
+  
+  multilogger = MultiLogger("p2p.log","p2p.err")     
+  printstyled(io_context,"Check Connectibility\n\n", bold=true, color=:cyan)
+  gpuinfo_p2p_access(io=io_context)
+  println(io_context,"\n")
+  log(multilogger,String(take!(io)))
+
+  printstyled(io_context,"Check P2P Bandwidth Unidirectional\n\n", bold=true, color=:cyan)
+  matrix = p2p_bandwidth_all()
+  show(io_context, "text/plain", matrix)
+  println(io_context,"\n")
+  log(multilogger,String(take!(io)))
+  
+  printstyled(io_context,"Check P2P Bandwidth Bidirectional\n\n", bold=true, color=:cyan)
+  matrix = p2p_bandwidth_bidirectional_all()
+  show(io_context, "text/plain", matrix)
+  println(io_context,"\n")
+  log(multilogger,String(take!(io)))
+
+  
+
 end

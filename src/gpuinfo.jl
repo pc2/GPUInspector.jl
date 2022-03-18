@@ -163,11 +163,11 @@ end
 """
 Query peer-to-peer (i.e. inter-GPU) access support.
 """
-function gpuinfo_p2p_access()
+function gpuinfo_p2p_access(; io::IO=stdout)
     # check p2p access
     ndevs = ngpus()
     if ndevs <= 1
-        println("Only a single GPU available.")
+        println(io,"Only a single GPU available.")
     else
         mat_p2p_access_supported = Matrix{Bool}(undef, ndevs, ndevs)
         mat_p2p_can_access = Matrix{Bool}(undef, ndevs, ndevs)
@@ -202,16 +202,16 @@ function gpuinfo_p2p_access()
             end
         end
 
-        printstyled("P2P Access Supported:\n"; bold=true)
-        display(mat_p2p_access_supported)
-        println()
+        printstyled(io,"P2P Access Supported:\n"; bold=true)
+        show(io, "text/plain",mat_p2p_access_supported)
+        println(io)
         if mat_p2p_access_supported != mat_p2p_can_access
-            printstyled("P2P Can Access:\n"; bold=true)
-            display(mat_p2p_can_access)
-            println()
+            printstyled(io,"P2P Can Access:\n"; bold=true)
+            show(io, "text/plain",mat_p2p_can_access)
+            println(io)
         end
-        printstyled("P2P Atomic Supported:\n"; bold=true)
-        display(mat_p2p_atomic_supported)
+        printstyled(io,"P2P Atomic Supported:\n"; bold=true)
+        show(io, "text/plain",mat_p2p_atomic_supported)
     end
     return nothing
 end
