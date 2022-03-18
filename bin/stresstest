@@ -1,0 +1,28 @@
+#!/bin/sh
+#=
+if [ $# -eq 0 ] || [ $# -eq 1 ]
+then
+    echo "No arguments supplied"
+    echo "Usage: ./stresstest <NoOfThreads> <timeInMinutes>"
+    exit
+fi
+exec julia -t $1 --project=../ -O3 "$0" -- $@
+=#
+import Pkg
+Pkg.instantiate()
+Pkg.add("CairoMakie")
+using GPUInspector
+using CairoMakie
+
+function main()
+  duration = parse(Int64,ARGS[2]) * 60
+  monitoring_start()
+  stresstest(devices(); duration=duration) 
+  results = monitoring_stop();
+
+  plot_monitoring_results(results)
+  savefig_monitoring_results(results)
+end
+
+
+main()

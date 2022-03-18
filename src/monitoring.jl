@@ -148,9 +148,9 @@ end
 Plot the quantities specified through `symbols` of a `MonitoringResults` object.
 Will generate a textual in-terminal / in-logfile plot using UnicodePlots.jl.
 """
-function plot_monitoring_results(r::MonitoringResults, symbols=keys(r.results); io::IO=stdout)
+function plot_monitoring_results(r::MonitoringResults, symbols=keys(r.results))
     for s in symbols
-        println(io,plot_monitoring_results(r, s))
+        display(plot_monitoring_results(r, s))
     end
     return nothing
 end
