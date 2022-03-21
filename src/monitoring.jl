@@ -64,6 +64,11 @@ function monitoring_start(;
             ),
         )
     end
+    if Threads.nthreads() < length(devices) + 1
+        @warn(
+            "Notice that there aren't enough Julia threads to test all available GPUs and monitoring them at the same time."
+        )
+    end
     if eltype(devices) == CuDevice
         devs = _cudevice2nvmldevice.(devices)
     else
@@ -327,5 +332,5 @@ Save plots of the quantities specified through `symbols` of a `MonitoringResults
 **Note:** Only available if CairoMakie.jl is loaded next to GPUInspector.jl.
 """
 function savefig_monitoring_results(r::MonitoringResults, symbols=keys(r.results); ext=:pdf)
-    error("You need to load CairoMakie.jl first.")
+    return error("You need to load CairoMakie.jl first.")
 end

@@ -46,6 +46,12 @@ function stresstest(
     if all(isnothing, [enforced_duration, duration, approx_duration, niter, mem])
         duration = 60 # default
     end
+    if (monitoring || ismonitoring()) && Threads.nthreads() < length(devices) + 1
+        ngpus = length(devices)
+        error(
+            "To test $ngpus GPUs while monitoring requires $(ngpus + 1) Julia threads. Only $(Threads.nthreads()) available.",
+        )
+    end
 
     if !isnothing(duration)
         # StressTestBatched
@@ -97,16 +103,17 @@ stresstest(device::CuDevice=CUDA.device(); kwargs...) = stresstest([device]; kwa
 
 function _default_threads(ntests)
     nthreads = Threads.nthreads()
-    if nthreads >= ntests + 1
+    monitoring = ismonitoring()
+    if nthreads >= ntests + monitoring + 1
         # if there are enough "worker" threads
         # use them and skip the main thread (1).
         return collect(2:(ntests + 1))
-    elseif nthreads == ntests
+    elseif nthreads >= ntests + monitoring
         return collect(1:ntests)
-    elseif nthreads < ntests
+    else
         # not enough threads
         @warn("There are too few Julia threads to run all tests in parallel!")
-        return [mod1(i, nthreads) for i in 1:ntests] # round-robin distribution
+        return [mod1(i, nthreads - monitoring) for i in 1:ntests] # round-robin distribution
     end
 end
 
