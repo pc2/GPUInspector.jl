@@ -1,7 +1,7 @@
 name = "GPUInspector"
 uuid = "608d808f-ff79-47b0-a25d-21f2c9b42853"
 authors = ["Carsten Bauer <carsten.bauer@uni-paderborn.de> and contributors"]
-version = "0.2.0"
+version = "0.2.1"
 
 [deps]
 CUDA = "052768ef-5323-5732-b1bb-66c8b64840ba"
