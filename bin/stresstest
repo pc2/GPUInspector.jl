@@ -18,7 +18,7 @@ function main()
   duration = parse(Int64,ARGS[2]) * 60
   results = stresstest(devices(); duration=duration, monitoring=true) 
 
-  save_monitoring_results(results)
+  save_monitoring_results("data.hdf5",results)
   plot_monitoring_results(results)
   savefig_monitoring_results(results)
 end
