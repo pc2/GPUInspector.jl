@@ -16,10 +16,9 @@ using CairoMakie
 
 function main()
   duration = parse(Int64,ARGS[2]) * 60
-  monitoring_start()
-  stresstest(devices(); duration=duration) 
-  results = monitoring_stop();
+  results = stresstest(devices(); duration=duration, monitoring=true) 
 
+  save_monitoring_results(results)
   plot_monitoring_results(results)
   savefig_monitoring_results(results)
 end
