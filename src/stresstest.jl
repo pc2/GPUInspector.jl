@@ -21,6 +21,7 @@ General settings:
 * `parallel` (default: `true`): If `true`, will (try to) run each GPU test on a different Julia thread. Make sure to have enough Julia threads.
 * `threads` (default: `nothing`): If `parallel == true`, this argument may be used to specify the Julia threads to use.
 * `clearmem` (default: `false`): If `true`, we call [`clear_all_gpus_memory`](@ref) after the stress test.
+* `io` (default: `stdout`): set the stream where the results should be printed.
 
 When `duration` is specifiec (i.e. [`StressTestEnforced`](@ref)) there is also:
 * `batch_duration` (default: `ceil(Int, duration/10)`): desired duration of one batch of matmuls.
@@ -38,65 +39,72 @@ function stresstest(
     clearmem=false,
     monitoring=false,
     batch_duration=nothing,
+    io::IO=stdout,
     kwargs...,
 )
-    if eltype(devices) != CuDevice
-        throw(ArgumentError("Unknown devices iterator / collection?!"))
-    end
-    if all(isnothing, [enforced_duration, duration, approx_duration, niter, mem])
-        duration = 60 # default
-    end
-    if (monitoring || ismonitoring()) && Threads.nthreads() < length(devices) + 1
-        ngpus = length(devices)
-        error(
-            "To test $ngpus GPUs while monitoring requires $(ngpus + 1) Julia threads. Only $(Threads.nthreads()) available.",
-        )
-    end
+    logger = ConsoleLogger(io)
 
-    if !isnothing(duration)
-        # StressTestBatched
-        verbose && @info("Will run for about $(duration) seconds on each GPU!")
-        ts = [
-            StressTestBatched(dev; duration, dtype, verbose, size, batch_duration) for
-            dev in devices
-        ]
-    elseif !isnothing(niter)
-        # StressTestFixedIter
-        verbose && @info("Will run $(niter) iterations on each GPU.")
-        ts = [StressTestFixedIter(dev; niter, dtype, verbose, size) for dev in devices]
-    elseif !isnothing(approx_duration)
-        # StressTestFixedIter
-        verbose &&
-            @info("Will try to run for $(duration) seconds on each GPU, but no promises!")
-        ts = [
-            StressTestFixedIter(dev; approx_duration, dtype, verbose, size) for
-            dev in devices
-        ]
-    elseif !isnothing(enforced_duration)
-        # StressTestEnforced
-        verbose &&
-            @info("Will run for almost precisely $(enforced_duration) seconds on each GPU.")
-        ts = [
-            StressTestEnforced(dev; enforced_duration, dtype, verbose, size) for
-            dev in devices
-        ]
-    elseif !isnothing(mem)
-        # StressTestStoreResults (gpu-burn-like)
-        verbose && @info("Will run a `StressTestStoreResults`.")
-        ts = [StressTestStoreResults(dev; mem, dtype, verbose, size) for dev in devices]
-    end
-    monitoring && monitoring_start(; devices=devices, verbose)
-    Δt = @elapsed _run_stresstests(ts; verbose, kwargs...)
-    if clearmem
-        verbose && @info("Clearing GPU memory.")
-        clear_all_gpus_memory(devices)
-    end
-    verbose && @info("Took $(round(Δt; digits=2)) seconds to run the tests.")
-    if monitoring
-        results = monitoring_stop(; verbose)
-        return results
-    else
-        return nothing
+    Base.with_logger(logger) do
+        if eltype(devices) != CuDevice
+            throw(ArgumentError("Unknown devices iterator / collection?!"))
+        end
+        if all(isnothing, [enforced_duration, duration, approx_duration, niter, mem])
+            duration = 60 # default
+        end
+        if (monitoring || ismonitoring()) && Threads.nthreads() < length(devices) + 1
+            ngpus = length(devices)
+            error(
+                "To test $ngpus GPUs while monitoring requires $(ngpus + 1) Julia threads. Only $(Threads.nthreads()) available.",
+            )
+        end
+
+        if !isnothing(duration)
+            # StressTestBatched
+            verbose && @info("Will run for about $(duration) seconds on each GPU!")
+            ts = [
+                StressTestBatched(dev; duration, dtype, verbose, size, batch_duration) for
+                dev in devices
+            ]
+        elseif !isnothing(niter)
+            # StressTestFixedIter
+            verbose && @info("Will run $(niter) iterations on each GPU.")
+            ts = [StressTestFixedIter(dev; niter, dtype, verbose, size) for dev in devices]
+        elseif !isnothing(approx_duration)
+            # StressTestFixedIter
+            verbose && @info(
+                "Will try to run for $(duration) seconds on each GPU, but no promises!"
+            )
+            ts = [
+                StressTestFixedIter(dev; approx_duration, dtype, verbose, size) for
+                dev in devices
+            ]
+        elseif !isnothing(enforced_duration)
+            # StressTestEnforced
+            verbose && @info(
+                "Will run for almost precisely $(enforced_duration) seconds on each GPU."
+            )
+            ts = [
+                StressTestEnforced(dev; enforced_duration, dtype, verbose, size) for
+                dev in devices
+            ]
+        elseif !isnothing(mem)
+            # StressTestStoreResults (gpu-burn-like)
+            verbose && @info("Will run a `StressTestStoreResults`.")
+            ts = [StressTestStoreResults(dev; mem, dtype, verbose, size) for dev in devices]
+        end
+        monitoring && monitoring_start(; devices=devices, verbose)
+        Δt = @elapsed _run_stresstests(ts; verbose, kwargs...)
+        if clearmem
+            verbose && @info("Clearing GPU memory.")
+            clear_all_gpus_memory(devices)
+        end
+        verbose && @info("Took $(round(Δt; digits=2)) seconds to run the tests.")
+        if monitoring
+            results = monitoring_stop(; verbose)
+            return results
+        else
+            return nothing
+        end
     end
 end
 stresstest(device::CuDevice=CUDA.device(); kwargs...) = stresstest([device]; kwargs...)

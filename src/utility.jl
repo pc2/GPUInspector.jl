@@ -192,3 +192,58 @@ end
 function pkgversion(pkg::Module)
     return Pkg.Types.read_project(joinpath(Base.pkgdir(pkg), "Project.toml")).version
 end
+
+
+"""
+MultiLogger struct which combines normal and error output streams. 
+Useful if you want your normal and error output that is printed to the terminal to also be saved to different files.
+
+**Arguments:**
+* `normal_file_name`: Path to normal output file.
+* `error_file_name`: Path to error output file.
+"""
+struct MultiLogger
+    normal_io::IO
+    error_io::IO
+    normal_logger::ConsoleLogger
+    error_logger::ConsoleLogger
+    
+    function MultiLogger(normal_file_name::String, error_file_name::String)
+        normal_io = open(normal_file_name, "w+")
+        normal_logger = ConsoleLogger(normal_io)
+
+        error_io = open(error_file_name, "w+")
+        error_logger = ConsoleLogger(error_io)
+
+        new(normal_io, error_io, normal_logger, error_logger)
+    end
+end
+
+"""
+Logging function for MultiLogger. Use this in combination with MultiLogger if you want 
+your normal and error output that is printed to the terminal to also be saved to different files.
+
+**Arguments:**
+* `MultiLogger`: Instance of MultiLogger struct.
+* `text`: Text to be printed to terminal and written to file.
+* `is_error` (default: `false`): Flag which decides whether `text` should be written into normal or error stream.
+"""
+function multi_log(multilogger::MultiLogger, text::String, is_error::Bool=false)
+
+      @info(text)
+      println("")
+
+      if !is_error
+          with_logger(multilogger.normal_logger) do
+            @info(text)
+            println("")
+          end
+          flush(multilogger.normal_io)
+      else
+          with_logger(multilogger.error_logger) do
+            @error(text)
+            println("")
+          end
+          flush(multilogger.error_io)
+      end
+end
