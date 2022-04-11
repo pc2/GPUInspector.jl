@@ -39,6 +39,7 @@ it takes to perform `_kernel_fma_nfmas() * size` many FMAs on CUDA cores.
 * `nkernel` (default: `5`): number of kernel calls that make up one benchmarking sample.
 * `nbench` (default: `5`): number of measurements to be performed the best of which is used for the TFLOP/s computation.
 * `verbose` (default: `true`): toggle printing.
+* `io` (default: `stdout`): set the stream where the results should be printed.
 """
 function peakflops_gpu_fmas(;
     size::Integer=5_000_000,
@@ -47,6 +48,7 @@ function peakflops_gpu_fmas(;
     nkernel=5,
     device::CuDevice=CUDA.device(),
     verbose=true,
+    io::IO=stdout,
 )
     device!(device) do
         d_a = CUDA.rand(dtype, size)
@@ -77,9 +79,9 @@ function peakflops_gpu_fmas(;
         flops = (flopcount * 1e-12) / t
 
         if verbose
-            printstyled("Peakflops (TFLOP/s):\n"; bold=true)
-            print(" └ max: ")
-            printstyled(round(flops; digits=2), "\n"; color=:green, bold=true)
+            printstyled(io,"Peakflops (TFLOP/s):\n"; bold=true)
+            print(io," └ max: ")
+            printstyled(io, round(flops; digits=2), "\n"; color=:green, bold=true)
         end
         return flops
     end

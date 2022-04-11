@@ -81,6 +81,7 @@ it takes to perform `_kernel_wmma_nwmmas()` many WMMAs on Tensor Cores.
 * `threads` (default: max. threads per block): how many threads to use per block (part of the kernel launch configuration).
 * `blocks` (default: `2048`): how many blocks to use (part of the kernel launch configuration).
 * `verbose` (default: `true`): toggle printing.
+* `io` (default: `stdout`): set the stream where the results should be printed.
 """
 function peakflops_gpu_wmmas(;
     device::CuDevice=CUDA.device(),
@@ -90,6 +91,7 @@ function peakflops_gpu_wmmas(;
     nkernel=10,
     verbose=true,
     dtype=Float16,
+    io::IO=stdout,
 )
     device!(device) do
         if Symbol(dtype) == :Float16
@@ -188,11 +190,11 @@ function peakflops_gpu_wmmas(;
         flops = (flopcount * 1e-12) / t
 
         if verbose
-            printstyled(
+            printstyled(io,
                 "Peakflops ($(Symbol(dtype) == :Int8 ? "TOP" : "TFLOP")/s):\n"; bold=true
             )
-            print(" └ max: ")
-            printstyled(round(flops; digits=2), "\n"; color=:green, bold=true)
+            print(io," └ max: ")
+            printstyled(io,round(flops; digits=2), "\n"; color=:green, bold=true)
         end
         return flops
     end
