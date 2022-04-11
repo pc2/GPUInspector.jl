@@ -61,7 +61,7 @@ function functional(verbose=true)
                 @info("Successful!")
             catch ex
                 @warn("Unsuccessful!")
-                println(ex)
+                @warn(ex)
                 println()
             end
         end

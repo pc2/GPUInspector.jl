@@ -289,15 +289,15 @@ end
 """
 List the available GPUs.
 """
-function gpus()
+function gpus(; io::IO=stdout)
     # Based on https://github.com/JuliaGPU/CUDA.jl/blob/ca77d1828f3bc0df34501de848c7a13f1df0b1fe/src/utilities.jl#L69
     devs = devices()
     if isempty(devs)
-        println("No CUDA-capable devices.")
+        println(io,"No CUDA-capable devices.")
     elseif length(devs) == 1
-        println("1 device:")
+        println(io,"1 device:")
     else
-        println(length(devs), " devices:")
+        println(io,length(devs), " devices:")
     end
     for (i, dev) in enumerate(devs)
         if has_nvml()
@@ -316,7 +316,7 @@ function gpus()
                 (free=available_memory(), total=total_memory())
             end
         end
-        println(
+        println(io,
             "  $(i-1): $str (sm_$(cap.major)$(cap.minor), $(Base.format_bytes(mem.free)) / $(Base.format_bytes(mem.total)) available)",
         )
     end

@@ -76,7 +76,6 @@ function p2p_bandwidth(
     bw_avg = mean(bws)
 
     if verbose
-        println("blaa;")
         # println("Memsize: $(Base.format_bytes(actual_memsize))\n")
         if times
             println(io,"t_min: $t_min")
