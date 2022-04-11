@@ -205,13 +205,17 @@ function gpuinfo_p2p_access(; io::IO=stdout)
         printstyled(io,"P2P Access Supported:\n"; bold=true)
         show(io, "text/plain",mat_p2p_access_supported)
         println(io)
+        println(io)
         if mat_p2p_access_supported != mat_p2p_can_access
             printstyled(io,"P2P Can Access:\n"; bold=true)
             show(io, "text/plain",mat_p2p_can_access)
             println(io)
+            println(io)
         end
         printstyled(io,"P2P Atomic Supported:\n"; bold=true)
         show(io, "text/plain",mat_p2p_atomic_supported)
+        println(io)
+        println(io)
     end
     return nothing
 end
