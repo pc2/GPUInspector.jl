@@ -9,8 +9,16 @@ fi
 exec julia -t $1 --project=$(dirname $0)/../ -O3 "$0" -- $@
 =#
 import Pkg
+
+bin_path = @__DIR__
+gpuinspector_path = join(split(bin_path, "/")[1:end-1],"/")
+
+Pkg.activate(@__DIR__)
+
 Pkg.instantiate()
 Pkg.add("CairoMakie")
+Pkg.add(path=gpuinspector_path)
+
 using GPUInspector
 using CairoMakie
 
