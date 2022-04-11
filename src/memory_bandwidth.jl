@@ -25,6 +25,7 @@ it takes to perform a memcpy of a certain amount of data (as specified by `memsi
 * `device` (default: `CUDA.device()`): CUDA device to be used.
 * `dtype` (default: `Cchar`): element type of the vectors.
 * `verbose` (default: `true`): toggle printing.
+* `io` (default: `stdout`): set the stream where the results should be printed.
 
 See also: [`memory_bandwidth_scaling`](@ref).
 """

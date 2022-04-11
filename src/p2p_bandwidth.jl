@@ -24,6 +24,7 @@ returns an inter-gpu memory bandwidth estimate (in GiB/s) derived from it.
 * `times` (default: `false`): toggle printing of measured times.
 * `alternate` (default: `false`): alternate `src` and `dst`, i.e. copy data back and forth.
 * `dtype` (default: `Float32`): see [`alloc_mem`](@ref).
+* `io` (default: `stdout`): set the stream where the results should be printed.
 
 **Examples:**
 ```julia

@@ -47,6 +47,7 @@ it takes to perform a SAXPY, i.e. `a * x[i] + y[i]`.
 * `nbench` (default: `5`): number of measurements to be performed the best of which is used for the GiB/s computation.
 * `verbose` (default: `true`): toggle printing.
 * `cublas` (default: `true`): toggle between `CUDA.axpy!` and a custom `saxpy_gpu_kernel!`.
+* `io` (default: `stdout`): set the stream where the results should be printed.
 
 See also: [`memory_bandwidth_saxpy_scaling`](@ref).
 """

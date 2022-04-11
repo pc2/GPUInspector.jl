@@ -10,6 +10,7 @@ returns the host-to-device bandwidth estimate (in GiB/s) derived from it.
 * `stats` (default: `false`): when `true` shows statistical information about the benchmark.
 * `times` (default: `false`): toggle printing of measured times.
 * `dtype` (default: `Cchar`): used data type.
+* `io` (default: `stdout`): set the stream where the results should be printed.
 
 **Examples:**
 ```julia
