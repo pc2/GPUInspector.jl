@@ -3,7 +3,6 @@
 exec julia --project=$(dirname $0)/../ -O3 "$0" -- $@
 =#
 import Pkg
-Pkg.develop()
 Pkg.instantiate()
 using GPUInspector
 using Logging
