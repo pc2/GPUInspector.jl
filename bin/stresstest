@@ -6,7 +6,7 @@ then
     echo "Usage: ./stresstest <NoOfThreads> <timeInMinutes>"
     exit
 fi
-exec julia -t $1 --project=$(dirname $0)/../ -O3 "$0" -- $@
+exec julia -t $1 --project=$(dirname $0)/ "$0" -- $@
 =#
 
 using GPUInspector
