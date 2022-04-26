@@ -1,0 +1,3 @@
+[deps]
+CairoMakie = "13f3f980-e62b-5c42-98c6-ff1f3baf88f0"
+GPUInspector = "608d808f-ff79-47b0-a25d-21f2c9b42853"

@@ -2,8 +2,6 @@
 #=
 exec julia --project=$(dirname $0)/../ -O3 "$0" -- $@
 =#
-import Pkg
-Pkg.instantiate()
 using GPUInspector
 
 function main()
