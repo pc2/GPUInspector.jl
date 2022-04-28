@@ -60,8 +60,7 @@ function functional(verbose=true)
                 CUDA.versioninfo()
                 @info("Successful!")
             catch ex
-                @warn("Unsuccessful!")
-                @warn(ex)
+                @warn("Unsuccessful!", ex)
                 println()
             end
         end
