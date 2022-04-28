@@ -10,6 +10,7 @@ returns the host-to-device bandwidth estimate (in GiB/s) derived from it.
 * `stats` (default: `false`): when `true` shows statistical information about the benchmark.
 * `times` (default: `false`): toggle printing of measured times.
 * `dtype` (default: `Cchar`): used data type.
+* `io` (default: `stdout`): set the stream where the results should be printed.
 
 **Examples:**
 ```julia
@@ -23,6 +24,7 @@ function host2device_bandwidth(
     dtype=Cchar,
     DtoDfactor=true,
     verbose=true,
+    io::IO=stdout,
     kwargs...,
 )
     N = Int(bytes(memsize) ÷ sizeof(dtype))
@@ -37,10 +39,10 @@ function host2device_bandwidth(
     #     println("GPU: ", gpu, " - ", name(gpu), "\n")
     # end
 
-    _perform_memcpy(mem_host, mem_gpu; title="Host <-> Device", verbose, kwargs...)
-    verbose && println()
+    _perform_memcpy(mem_host, mem_gpu; title="Host <-> Device", verbose, io=io, kwargs...)
+    verbose && println(io)
     _perform_memcpy(
-        mem_host_pinned, mem_gpu; title="Host (pinned) <-> Device", verbose, kwargs...
+        mem_host_pinned, mem_gpu; title="Host (pinned) <-> Device", verbose, io=io, kwargs...
     )
     # verbose && println()
     # _perform_memcpy(mem_gpu, mem_gpu2; title="Device <-> Device (same device)", DtoDfactor, verbose, kwargs...)
@@ -56,6 +58,7 @@ function _perform_memcpy(
     stats=false,
     DtoDfactor=false,
     verbose=true,
+    io::IO=stdout
 )
     NVTX.@range "host2dev: $title" begin
         sizeof(mem1) == sizeof(mem2) || error("sizeof(mem1) != sizeof(mem2)")
@@ -85,21 +88,21 @@ function _perform_memcpy(
 
         if verbose
             if times
-                println("t_min: $t_min")
-                println("t_max: $t_max")
-                println("t_avg: $t_avg")
+                println(io,"t_min: $t_min")
+                println(io,"t_max: $t_max")
+                println(io,"t_avg: $t_avg")
             end
-            printstyled("$(title) Bandwidth (GiB/s):\n"; bold=true)
+            printstyled(io,"$(title) Bandwidth (GiB/s):\n"; bold=true)
             if stats
-                print(" ├ max: ")
-                printstyled(round(bw_max; digits=2), "\n"; color=:green, bold=true)
-                println(" ├ min: ", round(bw_min; digits=2))
-                println(" ├ avg: ", round(bw_avg; digits=2))
-                print(" └ std_dev: ")
-                printstyled(round(std(bws); digits=2), "\n"; color=:yellow, bold=true)
+                print(io, " ├ max: ")
+                printstyled(io, round(bw_max; digits=2), "\n"; color=:green, bold=true)
+                println(io, " ├ min: ", round(bw_min; digits=2))
+                println(io, " ├ avg: ", round(bw_avg; digits=2))
+                print(io," └ std_dev: ")
+                printstyled(io,round(std(bws); digits=2), "\n"; color=:yellow, bold=true)
             else
-                print(" └ max: ")
-                printstyled(round(bw_max; digits=2), "\n"; color=:green, bold=true)
+                print(io," └ max: ")
+                printstyled(io,round(bw_max; digits=2), "\n"; color=:green, bold=true)
             end
         end
     end

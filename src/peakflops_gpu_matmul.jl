@@ -9,6 +9,7 @@ function peakflops_gpu_matmul_scaling(
     device=CUDA.device(),
     verbose=true,
     sizes=2 .^ (10:15),
+    io::IO=stdout,
     kwargs...,
 ) where {F}
     flops = zeros(length(sizes))
@@ -30,9 +31,10 @@ function peakflops_gpu_matmul_scaling(
             xscale=:log2,
         )
         UnicodePlots.lineplot!(p, [peak_size, peak_size], [0.0, peak_val]; color=:red)
-        println() # top margin
-        display(p)
-        println() # bottom margin
+        println(io) # top margin
+        show(io, "text/plain",p)
+        println(io) # bottom margin
+        println(io) # bottom margin
     end
     return sizes, flops
 end
@@ -51,11 +53,12 @@ it takes to perform `nmatmuls` many (in-place) matrix-matrix multiplications.
 * `nmatmuls` (default: `5`): number of matmuls that will make up the kernel to be timed.
 * `nbench` (default: `5`): number of measurements to be performed the best of which is used for the TFLOP/s computation.
 * `verbose` (default: `true`): toggle printing.
+* `io` (default: `stdout`): set the stream where the results should be printed.
 
 See also: [`peakflops_gpu_matmul_scaling`](@ref), [`peakflops_gpu_matmul_graphs`](@ref).
 """
 function peakflops_gpu_matmul(;
-    device=CUDA.device(), dtype=Float32, size=2^14, nmatmuls=5, nbench=5, verbose=true
+    device=CUDA.device(), dtype=Float32, size=2^14, nmatmuls=5, nbench=5, verbose=true, io::IO=stdout
 )
     device!(device) do
         C = CUDA.zeros(dtype, size, size)
@@ -79,9 +82,9 @@ function peakflops_gpu_matmul(;
 
         flops = (_flopcount_per_matmul(size) * nmatmuls * 1e-12) / t
         if verbose
-            printstyled("Peakflops (TFLOP/s):\n"; bold=true)
-            print(" └ max: ")
-            printstyled(round(flops; digits=2), "\n"; color=:green, bold=true)
+            printstyled(io,"Peakflops (TFLOP/s):\n"; bold=true)
+            print(io," └ max: ")
+            printstyled(io,round(flops; digits=2), "\n"; color=:green, bold=true)
         end
         return flops
     end
@@ -93,7 +96,7 @@ Same as [`peakflops_gpu_matmul`](@ref) but uses CUDA's graph API to define and l
 See also: [`peakflops_gpu_matmul_scaling`](@ref).
 """
 function peakflops_gpu_matmul_graphs(;
-    device=CUDA.device(), dtype=Float32, size=2^14, nmatmuls=5, nbench=5, verbose=true
+    device=CUDA.device(), dtype=Float32, size=2^14, nmatmuls=5, nbench=5, verbose=true, io::IO=stdout
 )
     device!(device) do
         C = CUDA.zeros(dtype, size, size)
@@ -115,9 +118,9 @@ function peakflops_gpu_matmul_graphs(;
 
         flops = (_flopcount_per_matmul(size) * nmatmuls * 1e-12) / t
         if verbose
-            printstyled("Peakflops (TFLOP/s):\n"; bold=true)
-            print(" └ max: ")
-            printstyled(round(flops; digits=2), "\n"; color=:green, bold=true)
+            printstyled(io,"Peakflops (TFLOP/s):\n"; bold=true)
+            print(io," └ max: ")
+            printstyled(io,round(flops; digits=2), "\n"; color=:green, bold=true)
         end
         return flops
     end

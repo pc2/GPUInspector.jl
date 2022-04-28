@@ -5,7 +5,7 @@ If `verbose=true` (default), displays a unicode plot. Returns the considered len
 For further options, see [`memory_bandwidth_saxpy`](@ref).
 """
 function memory_bandwidth_saxpy_scaling(;
-    device=CUDA.device(), sizes=[2^20 * i for i in 10:10:300], verbose=true, kwargs...
+    device=CUDA.device(), sizes=[2^20 * i for i in 10:10:300], verbose=true, io::IO=stdout, kwargs...
 )
     # sizes = [2^20 * i for i in 8:128] # V100
     bandwidths = zeros(length(sizes))
@@ -29,9 +29,9 @@ function memory_bandwidth_saxpy_scaling(;
             xscale=:log2,
         )
         UnicodePlots.lineplot!(p, [peak_size, peak_size], [0.0, peak_val]; color=:red)
-        println() # top margin
-        display(p)
-        println() # bottom margin
+        println(io) # top margin
+        println(io,p)
+        println(io) # bottom margin
     end
     return sizes, bandwidths
 end
@@ -47,6 +47,7 @@ it takes to perform a SAXPY, i.e. `a * x[i] + y[i]`.
 * `nbench` (default: `5`): number of measurements to be performed the best of which is used for the GiB/s computation.
 * `verbose` (default: `true`): toggle printing.
 * `cublas` (default: `true`): toggle between `CUDA.axpy!` and a custom `saxpy_gpu_kernel!`.
+* `io` (default: `stdout`): set the stream where the results should be printed.
 
 See also: [`memory_bandwidth_saxpy_scaling`](@ref).
 """
@@ -56,7 +57,8 @@ function memory_bandwidth_saxpy(;
     nbench=10,
     dtype=Float32,
     cublas=true,
-    verbose=true,
+    verbose=true, 
+    io::IO=stdout
 )
     device!(device) do
         a = dtype(pi)
@@ -80,9 +82,9 @@ function memory_bandwidth_saxpy(;
 
         bandwidth = 3.0 * sizeof(dtype) * size * (1024)^(-3) / t
         if verbose
-            printstyled("Memory Bandwidth (GiB/s):\n"; bold=true)
-            print(" └ max: ")
-            printstyled(round(bandwidth; digits=2), "\n"; color=:green, bold=true)
+            printstyled(io,"Memory Bandwidth (GiB/s):\n"; bold=true)
+            print(io," └ max: ")
+            printstyled(io,round(bandwidth; digits=2), "\n"; color=:green, bold=true)
         end
         return bandwidth
     end

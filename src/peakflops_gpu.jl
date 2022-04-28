@@ -7,12 +7,14 @@ Estimates the theoretical peak performance of a CUDA device in TFLOP/s.
 * `verbose` (default: `true`): toggle printing of information
 * `device` (default: `device()`): CUDA device to be analyzed
 * `dtype` (default: `tensorcores ? Float16 : Float32`): element type of the matrices
+* `io` (default: `stdout`): set the stream where the results should be printed.
 """
 function theoretical_peakflops_gpu(;
     device=CUDA.device(),
     tensorcores=hastensorcores(),
     dtype=tensorcores ? Float16 : Float32,
     verbose=true,
+    io::IO=stdout,
 )
     if tensorcores
         max_peakflops = _theoretical_peakflops_gpu_tensorcores(; device, dtype)
@@ -22,17 +24,17 @@ function theoretical_peakflops_gpu(;
 
     if verbose
         printstyled(
-            "Theoretical Peakflops ($(Symbol(dtype) == :Int8 ? "TOP" : "TFLOP")/s):\n";
+            io, "Theoretical Peakflops ($(Symbol(dtype) == :Int8 ? "TOP" : "TFLOP")/s):\n";
             bold=true,
         )
         if hastensorcores()
-            print(" ├ tensorcores: ")
-            printstyled(tensorcores, "\n"; color=:magenta, bold=true)
+            print(io, " ├ tensorcores: ")
+            printstyled(io, tensorcores, "\n"; color=:magenta, bold=true)
         end
-        print(" ├ dtype: ")
-        printstyled(Symbol(dtype), "\n"; color=:yellow, bold=true)
-        print(" └ max: ")
-        printstyled(round(max_peakflops; digits=1), "\n"; color=:green, bold=true)
+        print(io, " ├ dtype: ")
+        printstyled(io, Symbol(dtype), "\n"; color=:yellow, bold=true)
+        print(io, " └ max: ")
+        printstyled(io, round(max_peakflops; digits=1), "\n"; color=:green, bold=true)
     end
     return max_peakflops
 end
@@ -104,6 +106,7 @@ function peakflops_gpu(;
     tensorcores=hastensorcores(),
     verbose=true,
     dtype=tensorcores ? Float16 : Float32,
+    io::IO=stdout,
     kwargs...,
 )
     if tensorcores
@@ -113,16 +116,16 @@ function peakflops_gpu(;
     end
     if verbose
         printstyled(
-            "Peakflops ($(Symbol(dtype) == :Int8 ? "TOP" : "TFLOP")/s):\n"; bold=true
+            io, "Peakflops ($(Symbol(dtype) == :Int8 ? "TOP" : "TFLOP")/s):\n"; bold=true
         )
         if hastensorcores()
-            print(" ├ tensorcores: ")
-            printstyled(tensorcores, "\n"; color=:magenta, bold=true)
+            print(io, " ├ tensorcores: ")
+            printstyled(io, tensorcores, "\n"; color=:magenta, bold=true)
         end
-        print(" ├ dtype: ")
-        printstyled(Symbol(dtype), "\n"; color=:yellow, bold=true)
-        print(" └ max: ")
-        printstyled(round(flops; digits=1), "\n"; color=:green, bold=true)
+        print(io, " ├ dtype: ")
+        printstyled(io, Symbol(dtype), "\n"; color=:yellow, bold=true)
+        print(io, " └ max: ")
+        printstyled(io, round(flops; digits=1), "\n"; color=:green, bold=true)
     end
     return flops
 end

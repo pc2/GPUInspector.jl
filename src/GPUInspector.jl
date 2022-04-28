@@ -8,6 +8,7 @@ using Libdl
 using Distributed: addprocs, rmprocs, @everywhere, workers
 using Base: UUID
 using Pkg: Pkg
+using Logging
 
 # external
 using Requires
@@ -35,7 +36,7 @@ export clear_gpu_memory,
     cublasGemmEx_wrapper!,
     cublasGemmEx_wrapper_wrapper!,
     toggle_tensorcoremath,
-    hastensorcores
+    hastensorcores, MultiLogger, multi_log
 export get_cpusocket_temperatures, get_cpu_utilizations, get_cpu_utilization
 export logspace
 include("monitoring.jl")
