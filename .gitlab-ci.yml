@@ -1,38 +1,39 @@
 stages:
-  - testing-1.6
+  # - testing-1.6
   - testing-1.7
   - documentation
 
-julia/1.6:
-  stage: testing-1.6
-  tags:
-    - bauerc-noctua2
-  variables:
-    SCHEDULER_PARAMETERS: "-N 1 -n 1 -c 128 --gres=gpu:a100:4 -t 00:15:00 -A pc2-mitarbeiter -p gpu --exclusive"
-    JULIA_DEPOT_PATH: "/scratch/pc2-mitarbeiter/bauerc/.julia-ci"
-    JULIA_NUM_THREADS: "10"
-    JULIA_EXCLUSIVE: "1"
-    MKL_DYNAMIC: "false"
-    MKL_NUM_THREADS: "1"
-  only:
-    - main
-    # - pushes
-    # - tags
-    - merge_requests
-  script:
-    - /bin/bash -l
-    - ml system/CUDA/11.6.0
-    - ml lang/Julia/1.6.5-linux-x86_64
-    - rm -f Manifest.toml
-    - julia --color=yes --project=. -e 'using Pkg; Pkg.instantiate(verbose=true); Pkg.test(; coverage = false);'
+# julia/1.6:
+#   stage: testing-1.6
+#   tags:
+#     - bauerc-noctua2
+#   variables:
+#     SCHEDULER_PARAMETERS: "-N 1 -n 1 -c 128 --gres=gpu:a100:4 -t 00:15:00 -A pc2-mitarbeiter -p gpu --exclusive"
+#     JULIA_DEPOT_PATH: "/scratch/pc2-mitarbeiter/bauerc/.julia-ci"
+#     JULIA_NUM_THREADS: "10"
+#     JULIA_EXCLUSIVE: "1"
+#     MKL_DYNAMIC: "false"
+#     MKL_NUM_THREADS: "1"
+#   only:
+#     - main
+#     # - pushes
+#     # - tags
+#     - merge_requests
+#   script:
+#     - /bin/bash -l
+#     - ml system/CUDA/11.6.0
+#     - ml lang/Julia/1.6.5-linux-x86_64
+#     - rm -f Manifest.toml
+#     - julia --color=yes --project=. -e 'using Pkg; Pkg.instantiate(verbose=true); Pkg.test(; coverage = false);'
 
 # Generates code coverage
 julia/1.7:
   stage: testing-1.7
   tags:
-    - bauerc-noctua2
+    - bauerc-noctua
   variables:
-    SCHEDULER_PARAMETERS: "-N 1 -n 1 -c 128 --gres=gpu:a100:4 -t 00:15:00 -A pc2-mitarbeiter -p gpu --exclusive"
+    # SCHEDULER_PARAMETERS: "-N 1 -n 1 -c 128 --gres=gpu:a100:4 -t 00:15:00 -A pc2-mitarbeiter -p gpu --exclusive"
+    SCHEDULER_PARAMETERS: "-N 1 -n 1 -c 128 --gres=gpu:a100:8 -t 00:15:00 -A pc2-mitarbeiter -p dgx --exclusive"
     JULIA_DEPOT_PATH: "/scratch/pc2-mitarbeiter/bauerc/.julia-ci"
     JULIA_NUM_THREADS: "10"
     JULIA_EXCLUSIVE: "1"
@@ -56,9 +57,10 @@ julia/1.7:
 build-and-deploy-docs:
   stage: documentation
   tags:
-    - bauerc-noctua2
+    - bauerc-noctua
   variables:
-    SCHEDULER_PARAMETERS: "-N 1 -n 1 -c 128 --gres=gpu:a100:4 -t 00:15:00 -A pc2-mitarbeiter -p gpu --exclusive"
+    # SCHEDULER_PARAMETERS: "-N 1 -n 1 -c 128 --gres=gpu:a100:4 -t 00:15:00 -A pc2-mitarbeiter -p gpu --exclusive"
+    SCHEDULER_PARAMETERS: "-N 1 -n 1 -c 128 --gres=gpu:a100:8 -t 00:15:00 -A pc2-mitarbeiter -p dgx --exclusive"
     JULIA_DEPOT_PATH: "/scratch/pc2-mitarbeiter/bauerc/.julia-ci"
     JULIA_NUM_THREADS: "10"
     JULIA_EXCLUSIVE: "1"
