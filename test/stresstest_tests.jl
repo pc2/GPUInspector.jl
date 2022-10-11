@@ -74,16 +74,16 @@ end
         @test isnothing(plot_monitoring_results(r))
         @test isnothing(plot_monitoring_results(r, (:compute, :mem)))
     end
+end
 
-    @testset "savefig" begin
-        using CairoMakie
-        r = load_monitoring_results(joinpath(@__DIR__, "test.h5"))
-        @test isnothing(savefig_monitoring_results(r))
-        @test isnothing(
-            savefig_monitoring_results(r, (:compute, :mem))
-        )
-        @test isnothing(savefig_monitoring_results(r; ext=:png))
-        @test isnothing(savefig_monitoring_results(r; ext=:pdf))
-        rm.(filter(endswith(".pdf"), readdir())) # cleanup
-    end
+@testitem "Stresstest: monitoring results (CairoMakie)" begin
+    using CairoMakie
+    r = load_monitoring_results(joinpath(@__DIR__, "test.h5"))
+    @test isnothing(savefig_monitoring_results(r))
+    @test isnothing(
+        savefig_monitoring_results(r, (:compute, :mem))
+    )
+    @test isnothing(savefig_monitoring_results(r; ext=:png))
+    @test isnothing(savefig_monitoring_results(r; ext=:pdf))
+    rm.(filter(endswith(".pdf"), readdir())) # cleanup
 end
