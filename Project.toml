@@ -28,7 +28,7 @@ Glob = "1.3"
 HDF5 = "0.16"
 Reexport = "1.2"
 Requires = "1.3"
-ThreadPinning = "0.3, 0.4"
+ThreadPinning = "0.3, 0.4, 0.5, 0.6"
 UnicodePlots = "2.8"
 julia = "1.6"
 
@@ -36,6 +36,7 @@ julia = "1.6"
 CairoMakie = "13f3f980-e62b-5c42-98c6-ff1f3baf88f0"
 InteractiveUtils = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+TestItemRunner = "f8b46487-2199-4994-9208-9a1283c18c0a"
 
 [targets]
-test = ["Test", "InteractiveUtils", "CairoMakie"]
+test = ["Test", "InteractiveUtils", "CairoMakie", "TestItemRunner"]
