@@ -156,7 +156,7 @@ function gpuinfo(dev::CuDevice=CUDA.device(); io::IO=stdout)
         "Device PCI domain ID / bus ID / device ID: $(pci_domainid) / $(pci_busid) / $(pci_deviceid)",
     )
     println(io, "Compute mode: ", comp_modes[compute_mode + 1])
-    
+
     return nothing
 end
 
@@ -233,6 +233,7 @@ function ncudacores(major, minor, mp)
     # based on https://stackoverflow.com/questions/32530604/how-can-i-get-number-of-cores-in-cuda-device
     # helper_cuda_drvapi provides something like https://github.com/LinkedInAttic/datacl/blob/master/approxalgos/GPU_Work_Final2/bussAnal/filter/lib/helper_cuda_drvapi.h#L82 but is header only
     cores = 0
+    err_msg = "Unknown device type (major $major, minor $minor)"
     if major == 2 # Fermi
         if minor == 1
             cores = mp * 48
@@ -249,24 +250,32 @@ function ncudacores(major, minor, mp)
         elseif minor == 0
             cores = mp * 64
         else
-            error("Unknown device type")
+            error(err_msg)
         end
     elseif major == 7 # Volta and Turing
         if (minor == 0) || (minor == 5)
             cores = mp * 64
         else
-            error("Unknown device type")
+            error(err_msg)
         end
-    elseif major == 8 # Ampere
+    elseif major == 8 # Ampere and Ada Lovelace
         if minor == 0
             cores = mp * 64
         elseif minor == 6
             cores = mp * 128
+        elseif minor == 9
+            cores = mp * 128
         else
-            error("Unknown device type")
+            error(err_msg)
+        end
+    elseif major == 9 # Hopper
+        if minor == 0
+            cores = mp * 128
+        else
+            error(err_msg)
         end
     else
-        error("Unknown device type")
+        error(err_msg)
     end
     return cores
 end
@@ -277,10 +286,12 @@ function ntensorcores(device::CuDevice=CUDA.device())
 end
 function ntensorcores(major, minor, mp)
     # based on https://en.wikipedia.org/wiki/CUDA
-    if major == 8
+    if major == 8 # Ampere and Ada Lovelace
         return 4 * mp
     elseif major == 7
         return 8 * mp
+    elseif major == 9 # Hopper
+        return 4 * mp
     else
         return 0
     end
