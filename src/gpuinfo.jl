@@ -268,6 +268,12 @@ function ncudacores(major, minor, mp)
         else
             error(err_msg)
         end
+    elseif major == 9 # Hopper
+        if minor == 0
+            cores = mp * 128
+        else
+            error(err_msg)
+        end
     else
         error(err_msg)
     end
@@ -284,6 +290,8 @@ function ntensorcores(major, minor, mp)
         return 4 * mp
     elseif major == 7
         return 8 * mp
+    elseif major == 9 # Hopper
+        return 4 * mp
     else
         return 0
     end
