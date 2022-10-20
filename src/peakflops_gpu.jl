@@ -24,7 +24,8 @@ function theoretical_peakflops_gpu(;
 
     if verbose
         printstyled(
-            io, "Theoretical Peakflops ($(Symbol(dtype) == :Int8 ? "TOP" : "TFLOP")/s):\n";
+            io,
+            "Theoretical Peakflops ($(Symbol(dtype) == :Int8 ? "TOP" : "TFLOP")/s):\n";
             bold=true,
         )
         if hastensorcores()

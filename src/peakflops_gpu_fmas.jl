@@ -79,8 +79,8 @@ function peakflops_gpu_fmas(;
         flops = (flopcount * 1e-12) / t
 
         if verbose
-            printstyled(io,"Peakflops (TFLOP/s):\n"; bold=true)
-            print(io," └ max: ")
+            printstyled(io, "Peakflops (TFLOP/s):\n"; bold=true)
+            print(io, " └ max: ")
             printstyled(io, round(flops; digits=2), "\n"; color=:green, bold=true)
         end
         return flops

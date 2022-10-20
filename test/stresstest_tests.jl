@@ -22,17 +22,14 @@ end
 @testitem "Stresstest: monitoring" begin
     @testset "automatic (monitoring=true)" begin
         for dev in (device(), devices()) # single- and multi-gpu
-            @test typeof(
-                stresstest(dev; duration=2, verbose=false, monitoring=true)
-            ) == MonitoringResults
+            @test typeof(stresstest(dev; duration=2, verbose=false, monitoring=true)) ==
+                MonitoringResults
         end
     end
     @testset "manual" begin
         for devs in ([device()], devices()) # single- and multi-gpu
             @test isnothing(monitoring_start(; freq=1, devices=devs, verbose=false))
-            @test isnothing(
-                stresstest(devs; duration=2, verbose=false, monitoring=false)
-            )
+            @test isnothing(stresstest(devs; duration=2, verbose=false, monitoring=false))
             @test typeof(monitoring_stop(; verbose=false)) == MonitoringResults
         end
         # thread kwarg
@@ -59,8 +56,7 @@ end
         d[:qwe] = [rand(ndevs) for _ in 1:5]
         d[:jkl] = [rand(ndevs) for _ in 1:5]
         devices = Tuple{String,Base.UUID}[
-            (GPUInspector._device2string(dev), uuid(dev)) for
-            dev in collect(CUDA.devices())
+            (GPUInspector._device2string(dev), uuid(dev)) for dev in collect(CUDA.devices())
         ]
         r = MonitoringResults(rand(5), devices, d)
         cd(mktempdir()) do
@@ -80,9 +76,7 @@ end
     using CairoMakie
     r = load_monitoring_results(joinpath(@__DIR__, "test.h5"))
     @test isnothing(savefig_monitoring_results(r))
-    @test isnothing(
-        savefig_monitoring_results(r, (:compute, :mem))
-    )
+    @test isnothing(savefig_monitoring_results(r, (:compute, :mem)))
     @test isnothing(savefig_monitoring_results(r; ext=:png))
     @test isnothing(savefig_monitoring_results(r; ext=:pdf))
     rm.(filter(endswith(".pdf"), readdir())) # cleanup

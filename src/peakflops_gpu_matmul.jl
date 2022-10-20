@@ -32,7 +32,7 @@ function peakflops_gpu_matmul_scaling(
         )
         UnicodePlots.lineplot!(p, [peak_size, peak_size], [0.0, peak_val]; color=:red)
         println(io) # top margin
-        show(io, "text/plain",p)
+        show(io, "text/plain", p)
         println(io) # bottom margin
         println(io) # bottom margin
     end
@@ -58,7 +58,13 @@ it takes to perform `nmatmuls` many (in-place) matrix-matrix multiplications.
 See also: [`peakflops_gpu_matmul_scaling`](@ref), [`peakflops_gpu_matmul_graphs`](@ref).
 """
 function peakflops_gpu_matmul(;
-    device=CUDA.device(), dtype=Float32, size=2^14, nmatmuls=5, nbench=5, verbose=true, io::IO=stdout
+    device=CUDA.device(),
+    dtype=Float32,
+    size=2^14,
+    nmatmuls=5,
+    nbench=5,
+    verbose=true,
+    io::IO=stdout,
 )
     device!(device) do
         C = CUDA.zeros(dtype, size, size)
@@ -82,9 +88,9 @@ function peakflops_gpu_matmul(;
 
         flops = (_flopcount_per_matmul(size) * nmatmuls * 1e-12) / t
         if verbose
-            printstyled(io,"Peakflops (TFLOP/s):\n"; bold=true)
-            print(io," └ max: ")
-            printstyled(io,round(flops; digits=2), "\n"; color=:green, bold=true)
+            printstyled(io, "Peakflops (TFLOP/s):\n"; bold=true)
+            print(io, " └ max: ")
+            printstyled(io, round(flops; digits=2), "\n"; color=:green, bold=true)
         end
         return flops
     end
@@ -96,7 +102,13 @@ Same as [`peakflops_gpu_matmul`](@ref) but uses CUDA's graph API to define and l
 See also: [`peakflops_gpu_matmul_scaling`](@ref).
 """
 function peakflops_gpu_matmul_graphs(;
-    device=CUDA.device(), dtype=Float32, size=2^14, nmatmuls=5, nbench=5, verbose=true, io::IO=stdout
+    device=CUDA.device(),
+    dtype=Float32,
+    size=2^14,
+    nmatmuls=5,
+    nbench=5,
+    verbose=true,
+    io::IO=stdout,
 )
     device!(device) do
         C = CUDA.zeros(dtype, size, size)
@@ -118,9 +130,9 @@ function peakflops_gpu_matmul_graphs(;
 
         flops = (_flopcount_per_matmul(size) * nmatmuls * 1e-12) / t
         if verbose
-            printstyled(io,"Peakflops (TFLOP/s):\n"; bold=true)
-            print(io," └ max: ")
-            printstyled(io,round(flops; digits=2), "\n"; color=:green, bold=true)
+            printstyled(io, "Peakflops (TFLOP/s):\n"; bold=true)
+            print(io, " └ max: ")
+            printstyled(io, round(flops; digits=2), "\n"; color=:green, bold=true)
         end
         return flops
     end

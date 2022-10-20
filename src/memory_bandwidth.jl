@@ -2,7 +2,9 @@
     theoretical_memory_bandwidth(; device::CuDevice=CUDA.device(); verbose=true)
 Estimates the theoretical maximal GPU memory bandwidth in GiB/s.
 """
-function theoretical_memory_bandwidth(dev::CuDevice=CUDA.device(); verbose=true, io::IO=stdout)
+function theoretical_memory_bandwidth(
+    dev::CuDevice=CUDA.device(); verbose=true, io::IO=stdout
+)
     max_mem_clock_rate =
         CUDA.attribute(dev, CUDA.CU_DEVICE_ATTRIBUTE_MEMORY_CLOCK_RATE) * 1000 # in Hz
     max_mem_bus_width =
@@ -34,7 +36,7 @@ function memory_bandwidth(
     dtype=Cchar,
     verbose=true,
     DtoDfactor=true,
-    device=CUDA.device(), 
+    device=CUDA.device(),
     io::IO=stdout,
     kwargs...,
 )
@@ -62,7 +64,11 @@ If `verbose=true` (default), displays a unicode plot. Returns the considered dat
 For further options, see [`memory_bandwidth`](@ref).
 """
 function memory_bandwidth_scaling(;
-    device=CUDA.device(), sizes=logspace(1, exp2(30), 10), verbose=true, io::IO=stdout, kwargs...
+    device=CUDA.device(),
+    sizes=logspace(1, exp2(30), 10),
+    verbose=true,
+    io::IO=stdout,
+    kwargs...,
 )
     bandwidths = zeros(length(sizes))
     for (i, s) in enumerate(sizes)
@@ -84,7 +90,7 @@ function memory_bandwidth_scaling(;
         )
         UnicodePlots.lineplot!(p, [peak_size, peak_size], [0.0, peak_val]; color=:red)
         println(io) # top margin
-        println(io,p)
+        println(io, p)
         println(io) # bottom margin
     end
     return sizes, bandwidths

@@ -171,18 +171,7 @@ end
 """
 Checks whether the given `CuDevice` has Tensor Cores.
 """
-function hastensorcores(dev::CuDevice=CUDA.device())
-    cap = CUDA.capability(dev)
-    if cap == v"8.0.0"
-        # A100
-        return true
-    elseif cap == v"7.0.0"
-        # V100
-        return true
-    else
-        return false
-    end
-end
+hastensorcores(dev::CuDevice=CUDA.device()) = ntensorcores(dev) > 0
 
 function logspace(start, stop, length)
     return exp2.(range(log2(start), log2(stop); length=length))
@@ -192,9 +181,8 @@ function pkgversion(pkg::Module)
     return Pkg.Types.read_project(joinpath(Base.pkgdir(pkg), "Project.toml")).version
 end
 
-
 """
-MultiLogger struct which combines normal and error output streams. 
+MultiLogger struct which combines normal and error output streams.
 Useful if you want your normal and error output that is printed to the terminal to also be saved to different files.
 
 **Arguments:**
@@ -206,7 +194,7 @@ struct MultiLogger
     error_io::IO
     normal_logger::ConsoleLogger
     error_logger::ConsoleLogger
-    
+
     function MultiLogger(normal_file_name::String, error_file_name::String)
         normal_io = open(normal_file_name, "w+")
         normal_logger = ConsoleLogger(normal_io)
@@ -214,12 +202,12 @@ struct MultiLogger
         error_io = open(error_file_name, "w+")
         error_logger = ConsoleLogger(error_io)
 
-        new(normal_io, error_io, normal_logger, error_logger)
+        return new(normal_io, error_io, normal_logger, error_logger)
     end
 end
 
 """
-Logging function for MultiLogger. Use this in combination with MultiLogger if you want 
+Logging function for MultiLogger. Use this in combination with MultiLogger if you want
 your normal and error output that is printed to the terminal to also be saved to different files.
 
 **Arguments:**
@@ -228,21 +216,20 @@ your normal and error output that is printed to the terminal to also be saved to
 * `is_error` (default: `false`): Flag which decides whether `text` should be written into normal or error stream.
 """
 function multi_log(multilogger::MultiLogger, text::String, is_error::Bool=false)
+    @info(text)
+    println("")
 
-      @info(text)
-      println("")
-
-      if !is_error
-          with_logger(multilogger.normal_logger) do
+    if !is_error
+        with_logger(multilogger.normal_logger) do
             @info(text)
             println("")
-          end
-          flush(multilogger.normal_io)
-      else
-          with_logger(multilogger.error_logger) do
+        end
+        flush(multilogger.normal_io)
+    else
+        with_logger(multilogger.error_logger) do
             @error(text)
             println("")
-          end
-          flush(multilogger.error_io)
-      end
+        end
+        flush(multilogger.error_io)
+    end
 end

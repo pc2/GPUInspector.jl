@@ -99,7 +99,9 @@ function gpuinfo(dev::CuDevice=CUDA.device(); io::IO=stdout)
 
     # printing
     println(io, "Device: ", name(dev), " ($dev)")
-    println(io, "Total amount of global memory: ", Base.format_bytes(Int(CUDA.totalmem(dev))))
+    println(
+        io, "Total amount of global memory: ", Base.format_bytes(Int(CUDA.totalmem(dev)))
+    )
     println(io, "Number of CUDA cores: ", cores)
     println(io, "Number of multiprocessors: ", mp, " ($(cores ÷ mp) CUDA cores each)")
     println(io, "GPU max. clock rate: ", max_clock_rate, " MHz")
@@ -108,51 +110,65 @@ function gpuinfo(dev::CuDevice=CUDA.device(); io::IO=stdout)
     println(io, "L2 cache size: ", Base.format_bytes(l2cachesize))
     println(io, "Max. texture dimension sizes (1D): $maxTex1D")
     println(io, "Max. texture dimension sizes (2D): $maxTex2D_width, $maxTex2D_height")
-    println(io,
+    println(
+        io,
         "Max. texture dimension sizes (3D): $maxTex3D_width, $maxTex3D_height, $maxTex3D_depth",
     )
-    println(io,
+    println(
+        io,
         "Max. layered 1D texture size: $(maxTex1DLayered_width) ($(maxTex1DLayered_layers) layers)",
     )
-    println(io,
+    println(
+        io,
         "Max. layered 2D texture size: $(maxTex2DLayered_width), $(maxTex2DLayered_height) ($(maxTex2DLayered_layers) layers)",
     )
     println(io, "Total amount of constant memory: ", Base.format_bytes(total_constant_mem))
-    println(io,
-        "Total amount of shared memory per block: ", Base.format_bytes(shared_mem_per_block)
+    println(
+        io,
+        "Total amount of shared memory per block: ",
+        Base.format_bytes(shared_mem_per_block),
     )
     println(io, "Total number of registers available per block: ", regs_per_block)
     println(io, "Warp size: ", warpsize)
     println(io, "Max. number of threads per multiprocessor: ", max_threads_per_mp)
     println(io, "Max. number of threads per block: ", max_threads_per_block)
-    println(io,
+    println(
+        io,
         "Max. dimension size of a thread block (x,y,z): $(blockdim_x), $(blockdim_y), $(blockdim_z)",
     )
-    println(io,
+    println(
+        io,
         "Max. dimension size of a grid size (x,y,z): $(griddim_x), $(griddim_y), $(griddim_z)",
     )
     println(io, "Texture alignment: ", Base.format_bytes(texture_align))
     println(io, "Maximum memory pitch: ", Base.format_bytes(max_mem_pitch))
-    println(io,
+    println(
+        io,
         "Concurrent copy and kernel execution: ",
         gpu_overlap ? "Yes" : "No",
         " with $(async_engine_count) copy engine(s)",
     )
     println(io, "Run time limit on kernels: ", kernel_exec_timeout_enabled ? "Yes" : "No")
     println(io, "Integrated GPU sharing host memory: ", integrated ? "Yes" : "No")
-    println(io, "Support host page-locked memory mapping: ", can_map_host_mem ? "Yes" : "No")
+    println(
+        io, "Support host page-locked memory mapping: ", can_map_host_mem ? "Yes" : "No"
+    )
     println(io, "Concurrent kernel execution: ", concurrent_kernels ? "Yes" : "No")
     println(io, "Alignment requirement for surfaces: ", surface_alignment ? "Yes" : "No")
     println(io, "Device has ECC support: ", ecc_enabled ? "Yes" : "No")
-    println(io, "Device supports Unified Addressing (UVA): ", unified_addressing ? "Yes" : "No")
+    println(
+        io, "Device supports Unified Addressing (UVA): ", unified_addressing ? "Yes" : "No"
+    )
     println(io, "Device supports managed memory: ", managed_memory ? "Yes" : "No")
     println(io, "Device supports compute preemption: ", compute_preemption ? "Yes" : "No")
     println(io, "Supports cooperative kernel launch: ", cooperative_launch ? "Yes" : "No")
-    println(io,
+    println(
+        io,
         "Supports multi-device co-op kernel launch: ",
         cooperative_multi_dev_launch ? "Yes" : "No",
     )
-    println(io,
+    println(
+        io,
         "Device PCI domain ID / bus ID / device ID: $(pci_domainid) / $(pci_busid) / $(pci_deviceid)",
     )
     println(io, "Compute mode: ", comp_modes[compute_mode + 1])
@@ -167,7 +183,7 @@ function gpuinfo_p2p_access(; io::IO=stdout)
     # check p2p access
     ndevs = ngpus()
     if ndevs <= 1
-        println(io,"Only a single GPU available.")
+        println(io, "Only a single GPU available.")
     else
         mat_p2p_access_supported = Matrix{Bool}(undef, ndevs, ndevs)
         mat_p2p_can_access = Matrix{Bool}(undef, ndevs, ndevs)
@@ -202,18 +218,18 @@ function gpuinfo_p2p_access(; io::IO=stdout)
             end
         end
 
-        printstyled(io,"P2P Access Supported:\n"; bold=true)
-        show(io, "text/plain",mat_p2p_access_supported)
+        printstyled(io, "P2P Access Supported:\n"; bold=true)
+        show(io, "text/plain", mat_p2p_access_supported)
         println(io)
         println(io)
         if mat_p2p_access_supported != mat_p2p_can_access
-            printstyled(io,"P2P Can Access:\n"; bold=true)
-            show(io, "text/plain",mat_p2p_can_access)
+            printstyled(io, "P2P Can Access:\n"; bold=true)
+            show(io, "text/plain", mat_p2p_can_access)
             println(io)
             println(io)
         end
-        printstyled(io,"P2P Atomic Supported:\n"; bold=true)
-        show(io, "text/plain",mat_p2p_atomic_supported)
+        printstyled(io, "P2P Atomic Supported:\n"; bold=true)
+        show(io, "text/plain", mat_p2p_atomic_supported)
         println(io)
         println(io)
     end
@@ -233,7 +249,7 @@ function ncudacores(major, minor, mp)
     # based on https://stackoverflow.com/questions/32530604/how-can-i-get-number-of-cores-in-cuda-device
     # helper_cuda_drvapi provides something like https://github.com/LinkedInAttic/datacl/blob/master/approxalgos/GPU_Work_Final2/bussAnal/filter/lib/helper_cuda_drvapi.h#L82 but is header only
     cores = 0
-    err_msg = "Unknown device type (major $major, minor $minor)"
+    err_msg = "Unknown device type / compute capability version (major $major, minor $minor)"
     if major == 2 # Fermi
         if minor == 1
             cores = mp * 48
@@ -286,14 +302,29 @@ function ntensorcores(device::CuDevice=CUDA.device())
 end
 function ntensorcores(major, minor, mp)
     # based on https://en.wikipedia.org/wiki/CUDA
-    if major == 8 # Ampere and Ada Lovelace
-        return 4 * mp
-    elseif major == 7
-        return 8 * mp
+    err_msg = "Unknown device type / compute capability version (major $major, minor $minor)"
+    if major == 7
+        if minor in (0, 2, 5)
+            return 8 * mp
+        else
+            error(err_msg)
+        end
+    elseif major == 8 # Ampere and Ada Lovelace
+        if minor in (0, 6, 7, 9)
+            return 4 * mp
+        else
+            error(err_msg)
+        end
     elseif major == 9 # Hopper
-        return 4 * mp
-    else
+        if minor == 0
+            return 4 * mp
+        else
+            error(err_msg)
+        end
+    elseif major < 7
         return 0
+    else
+        error(err_msg)
     end
 end
 
@@ -304,11 +335,11 @@ function gpus(; io::IO=stdout)
     # Based on https://github.com/JuliaGPU/CUDA.jl/blob/ca77d1828f3bc0df34501de848c7a13f1df0b1fe/src/utilities.jl#L69
     devs = devices()
     if isempty(devs)
-        println(io,"No CUDA-capable devices.")
+        println(io, "No CUDA-capable devices.")
     elseif length(devs) == 1
-        println(io,"1 device:")
+        println(io, "1 device:")
     else
-        println(io,length(devs), " devices:")
+        println(io, length(devs), " devices:")
     end
     for (i, dev) in enumerate(devs)
         if has_nvml()
@@ -327,7 +358,8 @@ function gpus(; io::IO=stdout)
                 (free=available_memory(), total=total_memory())
             end
         end
-        println(io,
+        println(
+            io,
             "  $(i-1): $str (sm_$(cap.major)$(cap.minor), $(Base.format_bytes(mem.free)) / $(Base.format_bytes(mem.total)) available)",
         )
     end

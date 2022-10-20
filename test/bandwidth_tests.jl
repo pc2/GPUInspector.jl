@@ -7,15 +7,13 @@
         @test 0 ≤ p2p_bandwidth(; verbose=false)
         # options
         @test typeof(p2p_bandwidth(MB(100); verbose=false)) == Float64
-        @test typeof(
-            p2p_bandwidth(; src=CuDevice(0), dst=CuDevice(1), verbose=false)
-        ) == Float64
+        @test typeof(p2p_bandwidth(; src=CuDevice(0), dst=CuDevice(1), verbose=false)) ==
+            Float64
         @test typeof(p2p_bandwidth(; dtype=Float16, verbose=false)) == Float64
         @test typeof(p2p_bandwidth(; nbench=10, verbose=false)) == Float64
         @test typeof(p2p_bandwidth(; hist=true, verbose=true)) == Float64
         # p2p_bandwidth_all
-        @test typeof(p2p_bandwidth_all(; verbose=false)) ==
-            Matrix{Union{Nothing,Float64}}
+        @test typeof(p2p_bandwidth_all(; verbose=false)) == Matrix{Union{Nothing,Float64}}
         Mp2p = p2p_bandwidth_all(; verbose=false)
         @test all(isnothing, diag(Mp2p))
         @test all(
@@ -28,12 +26,9 @@
         @test 0 ≤ p2p_bandwidth_bidirectional(; verbose=false)
         # options
         @test typeof(p2p_bandwidth_bidirectional(MB(100); verbose=false)) == Float64
-        @test typeof(p2p_bandwidth_bidirectional(; dtype=Float16, verbose=false)) ==
-            Float64
-        @test typeof(p2p_bandwidth_bidirectional(; nbench=10, verbose=false)) ==
-            Float64
-        @test typeof(p2p_bandwidth_bidirectional(; hist=true, verbose=true)) ==
-            Float64
+        @test typeof(p2p_bandwidth_bidirectional(; dtype=Float16, verbose=false)) == Float64
+        @test typeof(p2p_bandwidth_bidirectional(; nbench=10, verbose=false)) == Float64
+        @test typeof(p2p_bandwidth_bidirectional(; hist=true, verbose=true)) == Float64
         # p2p_bandwidth_bidirectional_all
         @test typeof(p2p_bandwidth_bidirectional_all(; verbose=false)) ==
             Matrix{Union{Nothing,Float64}}
@@ -57,6 +52,6 @@ end
     @test typeof(memory_bandwidth(; dtype=Float32)) == Float64
 
     @test typeof(memory_bandwidth_saxpy()) == Float64
-    @test typeof(memory_bandwidth_saxpy(; size=2^20*2)) == Float64
+    @test typeof(memory_bandwidth_saxpy(; size=2^20 * 2)) == Float64
     @test typeof(memory_bandwidth_saxpy(; dtype=Float32)) == Float64
 end

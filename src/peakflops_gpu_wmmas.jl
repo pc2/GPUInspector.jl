@@ -104,7 +104,9 @@ function peakflops_gpu_wmmas(;
             dtype_c = dtype_d = Float32
         elseif Symbol(dtype) == :Int8
             if pkgversion(CUDA) < v"3.8.6"
-                error("At the time of writing, CUDA#master is required for Int8 WMMA support.")
+                error(
+                    "At the time of writing, CUDA#master is required for Int8 WMMA support."
+                )
             end
             m = n = k = 16
             dtype_a = dtype_b = Int8
@@ -190,11 +192,13 @@ function peakflops_gpu_wmmas(;
         flops = (flopcount * 1e-12) / t
 
         if verbose
-            printstyled(io,
-                "Peakflops ($(Symbol(dtype) == :Int8 ? "TOP" : "TFLOP")/s):\n"; bold=true
+            printstyled(
+                io,
+                "Peakflops ($(Symbol(dtype) == :Int8 ? "TOP" : "TFLOP")/s):\n";
+                bold=true,
             )
-            print(io," └ max: ")
-            printstyled(io,round(flops; digits=2), "\n"; color=:green, bold=true)
+            print(io, " └ max: ")
+            printstyled(io, round(flops; digits=2), "\n"; color=:green, bold=true)
         end
         return flops
     end

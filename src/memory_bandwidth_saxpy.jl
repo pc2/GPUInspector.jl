@@ -5,7 +5,11 @@ If `verbose=true` (default), displays a unicode plot. Returns the considered len
 For further options, see [`memory_bandwidth_saxpy`](@ref).
 """
 function memory_bandwidth_saxpy_scaling(;
-    device=CUDA.device(), sizes=[2^20 * i for i in 10:10:300], verbose=true, io::IO=stdout, kwargs...
+    device=CUDA.device(),
+    sizes=[2^20 * i for i in 10:10:300],
+    verbose=true,
+    io::IO=stdout,
+    kwargs...,
 )
     # sizes = [2^20 * i for i in 8:128] # V100
     bandwidths = zeros(length(sizes))
@@ -30,7 +34,7 @@ function memory_bandwidth_saxpy_scaling(;
         )
         UnicodePlots.lineplot!(p, [peak_size, peak_size], [0.0, peak_val]; color=:red)
         println(io) # top margin
-        println(io,p)
+        println(io, p)
         println(io) # bottom margin
     end
     return sizes, bandwidths
@@ -57,8 +61,8 @@ function memory_bandwidth_saxpy(;
     nbench=10,
     dtype=Float32,
     cublas=true,
-    verbose=true, 
-    io::IO=stdout
+    verbose=true,
+    io::IO=stdout,
 )
     device!(device) do
         a = dtype(pi)
@@ -82,9 +86,9 @@ function memory_bandwidth_saxpy(;
 
         bandwidth = 3.0 * sizeof(dtype) * size * (1024)^(-3) / t
         if verbose
-            printstyled(io,"Memory Bandwidth (GiB/s):\n"; bold=true)
-            print(io," └ max: ")
-            printstyled(io,round(bandwidth; digits=2), "\n"; color=:green, bold=true)
+            printstyled(io, "Memory Bandwidth (GiB/s):\n"; bold=true)
+            print(io, " └ max: ")
+            printstyled(io, round(bandwidth; digits=2), "\n"; color=:green, bold=true)
         end
         return bandwidth
     end

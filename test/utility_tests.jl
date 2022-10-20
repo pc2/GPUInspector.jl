@@ -9,7 +9,7 @@
     @test typeof(m) == MiB
     @test typeof(m̃) == MB
     @test string(b) == "4.0e7 B" || string(b) == "4.0e7 GPUInspector.B"
-    @test string(m) == "~38.15 MiB"  || string(m) == "~38.15 GPUInspector.MiB"
+    @test string(m) == "~38.15 MiB" || string(m) == "~38.15 GPUInspector.MiB"
     @test string(m̃) == "40.0 MB" || string(m̃) == "40.0 GPUInspector.MB"
     @test value(b) == 40_000_000
     @test value(m) ≈ 38.14697265625

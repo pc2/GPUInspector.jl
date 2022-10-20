@@ -42,7 +42,12 @@ function host2device_bandwidth(
     _perform_memcpy(mem_host, mem_gpu; title="Host <-> Device", verbose, io=io, kwargs...)
     verbose && println(io)
     _perform_memcpy(
-        mem_host_pinned, mem_gpu; title="Host (pinned) <-> Device", verbose, io=io, kwargs...
+        mem_host_pinned,
+        mem_gpu;
+        title="Host (pinned) <-> Device",
+        verbose,
+        io=io,
+        kwargs...,
     )
     # verbose && println()
     # _perform_memcpy(mem_gpu, mem_gpu2; title="Device <-> Device (same device)", DtoDfactor, verbose, kwargs...)
@@ -58,7 +63,7 @@ function _perform_memcpy(
     stats=false,
     DtoDfactor=false,
     verbose=true,
-    io::IO=stdout
+    io::IO=stdout,
 )
     NVTX.@range "host2dev: $title" begin
         sizeof(mem1) == sizeof(mem2) || error("sizeof(mem1) != sizeof(mem2)")
@@ -88,21 +93,21 @@ function _perform_memcpy(
 
         if verbose
             if times
-                println(io,"t_min: $t_min")
-                println(io,"t_max: $t_max")
-                println(io,"t_avg: $t_avg")
+                println(io, "t_min: $t_min")
+                println(io, "t_max: $t_max")
+                println(io, "t_avg: $t_avg")
             end
-            printstyled(io,"$(title) Bandwidth (GiB/s):\n"; bold=true)
+            printstyled(io, "$(title) Bandwidth (GiB/s):\n"; bold=true)
             if stats
                 print(io, " ├ max: ")
                 printstyled(io, round(bw_max; digits=2), "\n"; color=:green, bold=true)
                 println(io, " ├ min: ", round(bw_min; digits=2))
                 println(io, " ├ avg: ", round(bw_avg; digits=2))
-                print(io," └ std_dev: ")
-                printstyled(io,round(std(bws); digits=2), "\n"; color=:yellow, bold=true)
+                print(io, " └ std_dev: ")
+                printstyled(io, round(std(bws); digits=2), "\n"; color=:yellow, bold=true)
             else
-                print(io," └ max: ")
-                printstyled(io,round(bw_max; digits=2), "\n"; color=:green, bold=true)
+                print(io, " └ max: ")
+                printstyled(io, round(bw_max; digits=2), "\n"; color=:green, bold=true)
             end
         end
     end
