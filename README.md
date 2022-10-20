@@ -26,7 +26,7 @@
 ![Lifecycle](https://img.shields.io/badge/lifecycle-experimental-orange.svg)
 -->
 
-*Inspecting high-performance multi-GPU nodes with Julia*
+*Inspecting high-performance (multi-)GPU systems with Julia*
 
 | **Documentation**                                                               | **Build Status**                                                                                |  **Quality**                                                                                |
 |:-------------------------------------------------------------------------------:|:-----------------------------------------------------------------------------------------------:|:-----------------------------------------------------------------------------------------------:|
