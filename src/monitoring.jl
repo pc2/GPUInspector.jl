@@ -327,10 +327,10 @@ function _symbol2title_and_label(s::Symbol)
 end
 
 """
-    savefig_monitoring_results(r::MonitoringResults, symbols=keys(r.results))
+    savefig_monitoring_results(r::MonitoringResults, symbols=keys(r.results); ext=:pdf)
 Save plots of the quantities specified through `symbols` of a `MonitoringResults` object to disk.
 **Note:** Only available if CairoMakie.jl is loaded next to GPUInspector.jl.
 """
-function savefig_monitoring_results(r::MonitoringResults, symbols=keys(r.results); ext=:pdf)
+function savefig_monitoring_results(r::Any, symbols::Any=nothing; ext=:pdf)
     return error("You need to load CairoMakie.jl first.")
 end

@@ -11,7 +11,6 @@ using Pkg: Pkg
 using Logging
 
 # external
-using Requires
 using Reexport
 @reexport using CUDA
 @reexport using ThreadPinning
@@ -44,10 +43,6 @@ include("memory_bandwidth_saxpy.jl")
 include("hdf5.jl")
 
 function __init__()
-    @require CairoMakie = "13f3f980-e62b-5c42-98c6-ff1f3baf88f0" include(
-        "requires/cairomakie.jl"
-    )
-
     if CUDA.functional()
         toggle_tensorcoremath(true; verbose=false) # by default, use CUDA.FAST_MATH
     end
