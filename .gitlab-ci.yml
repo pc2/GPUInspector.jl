@@ -1,82 +1,45 @@
 stages:
-  # - testing-1.6
-  - testing-1.7
+  - test
   - documentation
-
-# julia/1.6:
-#   stage: testing-1.6
-#   tags:
-#     - bauerc-noctua2
-#   variables:
-#     SCHEDULER_PARAMETERS: "-N 1 -n 1 -c 128 --gres=gpu:a100:4 -t 00:15:00 -A pc2-mitarbeiter -p gpu --exclusive"
-#     JULIA_DEPOT_PATH: "/scratch/pc2-mitarbeiter/bauerc/.julia-ci"
-#     JULIA_NUM_THREADS: "10"
-#     JULIA_EXCLUSIVE: "1"
-#     MKL_DYNAMIC: "false"
-#     MKL_NUM_THREADS: "1"
-#   only:
-#     - main
-#     # - pushes
-#     # - tags
-#     - merge_requests
-#   script:
-#     - /bin/bash -l
-#     - ml system/CUDA/11.6.0
-#     - ml lang/Julia/1.6.5-linux-x86_64
-#     - rm -f Manifest.toml
-#     - julia --color=yes --project=. -e 'using Pkg; Pkg.instantiate(verbose=true); Pkg.test(; coverage = false);'
+variables:
+  SCHEDULER_PARAMETERS: "-N 1 -n 1 -c 128 -t 00:15:00 -A pc2-mitarbeiter -p dgx --qos=devel --gres=gpu:a100:8 --exclusive"
+  JULIA_DEPOT_PATH: "/scratch/pc2-mitarbeiter/bauerc/.julia-ci"
+  JULIA_NUM_THREADS: "10"
+  JULIA_EXCLUSIVE: "1"
+  JULIA_1_9: "lang/JuliaHPC/1.9.2-foss-2022a-CUDA-11.7.0"
+  MKL_DYNAMIC: "false"
+  MKL_NUM_THREADS: "1"
+default:
+  tags:
+    - bauerc-noctua2
 
 # Generates code coverage
-julia/1.7:
-  stage: testing-1.7
-  tags:
-    - bauerc-noctua
-  variables:
-    # SCHEDULER_PARAMETERS: "-N 1 -n 1 -c 128 --gres=gpu:a100:4 -t 00:15:00 -A pc2-mitarbeiter -p gpu --exclusive"
-    SCHEDULER_PARAMETERS: "-N 1 -n 1 -c 128 --gres=gpu:a100:8 -t 00:15:00 -A pc2-mitarbeiter -p dgx --exclusive"
-    JULIA_DEPOT_PATH: "/scratch/pc2-mitarbeiter/bauerc/.julia-ci"
-    JULIA_NUM_THREADS: "10"
-    JULIA_EXCLUSIVE: "1"
-    MKL_DYNAMIC: "false"
-    MKL_NUM_THREADS: "1"
-  only:
-    - main
-    # - pushes
-    # - tags
-    - merge_requests
+julia/1.9:
+  stage: testing
+  rules:
+    - changes:
+        - "README.md"
+    - when: on_success
   script:
     - /bin/bash -l
-    - ml lang/JuliaHPC/1.7.2-fosscuda-2022a-linux-x86_64
-    - rm -f Manifest.toml
-    - julia --color=yes --project=. -e 'using Pkg; Pkg.instantiate(verbose=true); Pkg.test(; coverage = true);'
+    - module load $JULIA_1_9
+    - julia --color=yes --project=. -e 'using Pkg; Pkg.build(verbose=true); Pkg.test(; coverage = false);'
     - julia --color=yes --project=test/coverage -e 'import Pkg; Pkg.instantiate()'
     - julia --color=yes --project=test/coverage test/coverage/coverage.jl
+  allow_failure: false
 
 
 # Documentation
 build-and-deploy-docs:
   stage: documentation
-  tags:
-    - bauerc-noctua
-  variables:
-    # SCHEDULER_PARAMETERS: "-N 1 -n 1 -c 128 --gres=gpu:a100:4 -t 00:15:00 -A pc2-mitarbeiter -p gpu --exclusive"
-    SCHEDULER_PARAMETERS: "-N 1 -n 1 -c 128 --gres=gpu:a100:8 -t 00:15:00 -A pc2-mitarbeiter -p dgx --exclusive"
-    JULIA_DEPOT_PATH: "/scratch/pc2-mitarbeiter/bauerc/.julia-ci"
-    JULIA_NUM_THREADS: "10"
-    JULIA_EXCLUSIVE: "1"
-    MKL_DYNAMIC: "false"
-    MKL_NUM_THREADS: "1"
   only:
     - main
+    - pushes
     - tags
-    # - pushes
-    # - merge_requests
+    - external_pull_requests
   script:
     - /bin/bash -l
-    - ml lang/JuliaHPC/1.7.2-fosscuda-2022a-linux-x86_64
+    - module load $JULIA_1_9
     - cd docs
-    # - module load git
-    # - git --version
-    # - which git
     - julia --color=yes build_docs.jl
   allow_failure: false
