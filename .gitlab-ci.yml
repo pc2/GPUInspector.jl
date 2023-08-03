@@ -2,7 +2,7 @@ stages:
   - test
   - documentation
 variables:
-  SCHEDULER_PARAMETERS: "-N 1 -n 1 -c 128 -t 00:15:00 -A pc2-mitarbeiter -p dgx --qos=devel --gres=gpu:a100:8 --exclusive"
+  SCHEDULER_PARAMETERS: "-N 1 -n 1 -c 32 -t 00:15:00 -A pc2-mitarbeiter -p dgx --qos=devel --gres=gpu:a100:2"
   JULIA_DEPOT_PATH: "/scratch/pc2-mitarbeiter/bauerc/.julia-ci"
   JULIA_NUM_THREADS: "10"
   JULIA_EXCLUSIVE: "1"
