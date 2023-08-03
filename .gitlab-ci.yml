@@ -15,7 +15,7 @@ default:
 
 # Generates code coverage
 julia/1.9:
-  stage: testing
+  stage: test
   rules:
     - changes:
         - "README.md"
