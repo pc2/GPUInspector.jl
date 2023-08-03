@@ -40,7 +40,7 @@ The package is registered in the General registry and can readily be added by us
 ] add GPUInspector
 ```
 
-**Note:** The minimal required Julia version is 1.9.
+**Note:** The recommended Julia version is >= 1.9.
 
 ## Example
 
