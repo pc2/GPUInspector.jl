@@ -14,7 +14,7 @@ using CairoMakie
 
 
 function main()
-  duration = parse(Int64,ARGS[2]) * 60
+  duration = parse(Int64,ARGS[3]) * 60
   results = stresstest(devices(); duration=duration, monitoring=true) 
 
   save_monitoring_results("data.hdf5",results)

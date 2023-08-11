@@ -58,7 +58,9 @@ function _theoretical_peakflops_gpu_tensorcores(;
     device=CUDA.device(), dtype=Float16, verbose=true
 )
     cap = CUDA.capability(device)
-    if cap == v"8.0.0"
+    if cap == v"8.6.0"
+        devtype = :A40
+    elseif cap == v"8.0.0"
         devtype = :A100
     elseif cap == v"7.0.0"
         devtype = :V100
