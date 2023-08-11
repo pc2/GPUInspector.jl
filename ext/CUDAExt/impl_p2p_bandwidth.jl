@@ -1,40 +1,6 @@
-@inline function _time_cuda_elapsed(kernel::F, mem_dst, mem_src) where {F}
-    t = CUDA.context!(context(mem_src)) do
-        CUDA.@elapsed begin
-            NVTX.@range "p2p: kernel call" begin
-                kernel(mem_dst, mem_src)
-            end
-        end
-    end
-    return t
-end
-
-"""
-    p2p_bandwidth([memsize::UnitPrefixedBytes]; kwargs...)
-
-Performs a peer-to-peer memory copy benchmark (time measurement) and
-returns an inter-gpu memory bandwidth estimate (in GiB/s) derived from it.
-
-**Keyword arguments:**
-* `src` (default: `0`): source device
-* `dst` (default: `1`): destination device
-* `nbench` (default: `5`): number of time measurements (i.e. p2p memcopies)
-* `verbose` (default: `true`): set to false to turn off any printing.
-* `hist` (default: `false`): when `true`, a UnicodePlots-based histogram is printed.
-* `times` (default: `false`): toggle printing of measured times.
-* `alternate` (default: `false`): alternate `src` and `dst`, i.e. copy data back and forth.
-* `dtype` (default: `Float32`): see [`alloc_mem`](@ref).
-* `io` (default: `stdout`): set the stream where the results should be printed.
-
-**Examples:**
-```julia
-p2p_bandwidth()
-p2p_bandwidth(MiB(1024))
-p2p_bandwidth(KiB(20_000); dtype=Int32)
-```
-"""
 function p2p_bandwidth(
-    memsize::UnitPrefixedBytes=B(40_000_000);
+    ::CUDABackend;
+    memsize::UnitPrefixedBytes=B(40_000_000),
     nbench=5,
     verbose=true,
     hist=false,
@@ -45,6 +11,9 @@ function p2p_bandwidth(
     dst=1,
     io::IO=stdout,
 )
+    if ngpus() < 2
+        error("At least 2 GPUs are needed for the P2P benchmark.")
+    end
     mem_src, mem_dst = alloc_mem(memsize; devs=(src, dst), dtype)
     actual_memsize = sizeof(mem_src)
     ts = zeros(nbench)
@@ -97,14 +66,11 @@ function p2p_bandwidth(
     return bw_max
 end
 
-"""
-    p2p_bandwidth_all(args...; kwargs...)
-
-Run [`p2p_bandwidth`](@ref) for all combinations of devices.
-Returns a matrix with the p2p memory bandwidth estimates.
-"""
-function p2p_bandwidth_all(args...; io::IO=stdout, verbose=false, kwargs...)
+function p2p_bandwidth_all(::CUDABackend; io::IO=stdout, verbose=false, kwargs...)
     ngpus = length(CUDA.devices())
+    if ngpus < 2
+        error("At least 2 GPUs are needed for the P2P benchmark.")
+    end
     return [
         if src == dst
             nothing
@@ -114,31 +80,9 @@ function p2p_bandwidth_all(args...; io::IO=stdout, verbose=false, kwargs...)
     ]
 end
 
-function Base.copyto!(
-    dest::DenseCuArray{T}, src::DenseCuArray{T}, stream::CuStream; async=true
-) where {T}
-    # based on https://github.com/JuliaGPU/CUDA.jl/blob/5413070c13be8809916900205376f6c062c55a67/src/array.jl#L421
-    doffs = 1
-    soffs = 1
-    n = length(src)
-    context!(context(src)) do
-        GC.@preserve src dest begin
-            unsafe_copyto!(pointer(dest, doffs), pointer(src, soffs), n; async, stream)
-            if Base.isbitsunion(T)
-                unsafe_copyto!(
-                    typetagdata(dest, doffs), typetagdata(src, soffs), n; async, stream
-                )
-            end
-        end
-    end
-    return dest
-end
-
-"""
-Same as [`p2p_bandwidth`](@ref) but measures the bidirectional bandwidth (copying data back and forth).
-"""
 function p2p_bandwidth_bidirectional(
-    memsize::UnitPrefixedBytes=B(40_000_000);
+    ::CUDABackend;
+    memsize::UnitPrefixedBytes=B(40_000_000),
     nbench=20,
     verbose=true,
     hist=false,
@@ -149,6 +93,9 @@ function p2p_bandwidth_bidirectional(
     repeat=100,
     io::IO=stdout,
 )
+    if ngpus() < 2
+        error("At least 2 GPUs are needed for the P2P benchmark.")
+    end
     mem_dev1, mem_dev2 = alloc_mem(memsize; dtype, devs=(dev1, dev2))
     actual_memsize = sizeof(mem_dev1)
     ts = zeros(nbench)
@@ -191,6 +138,22 @@ function p2p_bandwidth_bidirectional(
     end
 
     return bw_max
+end
+
+function p2p_bandwidth_bidirectional_all(::CUDABackend; kwargs...)
+    ngpus = length(CUDA.devices())
+    if ngpus < 2
+        error("At least 2 GPUs are needed for the P2P benchmark.")
+    end
+    return [
+        if src == dst
+            nothing
+        else
+            p2p_bandwidth_bidirectional(
+                CUDABackend(); dev1=src, dev2=dst, verbose=false, kwargs...
+            )
+        end for src in 0:(ngpus - 1), dst in 0:(ngpus - 1)
+    ]
 end
 
 function _perform_p2p_memcpy_bidirectional(dev1, mem_dev1, dev2, mem_dev2; repeat=5)
@@ -247,20 +210,16 @@ function _perform_p2p_memcpy_bidirectional(dev1, mem_dev1, dev2, mem_dev2; repea
     return t
 end
 
-"""
-Same as [`p2p_bandwidth_all`](@ref) but measures the bidirectional bandwidth (copying data back and forth).
-"""
-function p2p_bandwidth_bidirectional_all(args...; kwargs...)
-    ngpus = length(CUDA.devices())
-    return [
-        if src == dst
-            nothing
-        else
-            p2p_bandwidth_bidirectional(
-                args...; dev1=src, dev2=dst, verbose=false, kwargs...
-            )
-        end for src in 0:(ngpus - 1), dst in 0:(ngpus - 1)
-    ]
+# TODO: Maybe move stuff below somewhere else?
+@inline function _time_cuda_elapsed(kernel::F, mem_dst, mem_src) where {F}
+    t = CUDA.context!(context(mem_src)) do
+        CUDA.@elapsed begin
+            NVTX.@range "p2p: kernel call" begin
+                kernel(mem_dst, mem_src)
+            end
+        end
+    end
+    return t
 end
 
 ## delay kernel (Warning: not sure the ref flag is working as intended!)
@@ -276,4 +235,24 @@ function delay(delay_flag, timeout_clocks=10_000_000)
             break
         end
     end
+end
+
+function Base.copyto!(
+    dest::DenseCuArray{T}, src::DenseCuArray{T}, stream::CuStream; async=true
+) where {T}
+    # based on https://github.com/JuliaGPU/CUDA.jl/blob/5413070c13be8809916900205376f6c062c55a67/src/array.jl#L421
+    doffs = 1
+    soffs = 1
+    n = length(src)
+    context!(context(src)) do
+        GC.@preserve src dest begin
+            unsafe_copyto!(pointer(dest, doffs), pointer(src, soffs), n; async, stream)
+            if Base.isbitsunion(T)
+                unsafe_copyto!(
+                    typetagdata(dest, doffs), typetagdata(src, soffs), n; async, stream
+                )
+            end
+        end
+    end
+    return dest
 end

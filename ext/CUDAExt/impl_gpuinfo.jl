@@ -1,15 +1,51 @@
+ngpus(::CUDABackend) = length(CUDA.devices())
+
+function gpus(::CUDABackend; io::IO=stdout)
+    # Based on https://github.com/JuliaGPU/CUDA.jl/blob/ca77d1828f3bc0df34501de848c7a13f1df0b1fe/src/utilities.jl#L69
+    devs = devices()
+    if isempty(devs)
+        println(io, "No CUDA-capable devices.")
+    elseif length(devs) == 1
+        println(io, "1 device:")
+    else
+        println(io, length(devs), " devices:")
+    end
+    for (i, dev) in enumerate(devs)
+        if has_nvml()
+            mig = uuid(dev) != parent_uuid(dev)
+            nvml_gpu = NVML.Device(parent_uuid(dev))
+            nvml_dev = NVML.Device(uuid(dev); mig)
+
+            str = NVML.name(nvml_dev)
+            cap = NVML.compute_capability(nvml_gpu)
+            mem = NVML.memory_info(nvml_dev)
+        else
+            str = name(dev)
+            cap = capability(dev)
+            mem = device!(dev) do
+                # this requires a device context, so we prefer NVML
+                (free=available_memory(), total=total_memory())
+            end
+        end
+        println(
+            io,
+            "  $(i-1): $str (sm_$(cap.major)$(cap.minor), $(Base.format_bytes(mem.free)) / $(Base.format_bytes(mem.total)) available)",
+        )
+    end
+end
+
 """
     gpuinfo(deviceid::Integer)
 
-Print out detailed information about the GPU with the given `deviceid`.
+Print out detailed information about the NVIDIA GPU with the given `deviceid`.
 
 Heavily inspired by the CUDA sample "deviceQueryDrv.cpp".
 """
-function gpuinfo(deviceid::Integer; io::IO=stdout)
+function gpuinfo(::CUDABackend, deviceid::Integer; io::IO=stdout)
     0 <= deviceid <= ngpus() - 1 || throw(ArgumentError("Invalid device id."))
     return gpuinfo(CuDevice(deviceid); io)
 end
-function gpuinfo(dev::CuDevice=CUDA.device(); io::IO=stdout)
+function gpuinfo(::CUDABackend, dev::CuDevice=CUDA.device(); io::IO=stdout)
     # query
     mp = nmultiprocessors(dev)
     cores = ncudacores(dev)
@@ -176,14 +212,11 @@ function gpuinfo(dev::CuDevice=CUDA.device(); io::IO=stdout)
     return nothing
 end
 
-"""
-Query peer-to-peer (i.e. inter-GPU) access support.
-"""
-function gpuinfo_p2p_access(; io::IO=stdout)
+function gpuinfo_p2p_access(::CUDABackend; io::IO=stdout)
     # check p2p access
     ndevs = ngpus()
     if ndevs <= 1
-        println(io, "Only a single GPU available.")
+        error("Only a single GPU available.")
     else
         mat_p2p_access_supported = Matrix{Bool}(undef, ndevs, ndevs)
         mat_p2p_can_access = Matrix{Bool}(undef, ndevs, ndevs)
@@ -234,133 +267,4 @@ function gpuinfo_p2p_access(; io::IO=stdout)
         println(io)
     end
     return nothing
-end
-
-ngpus() = length(CUDA.devices())
-function nmultiprocessors(dev::CuDevice=CUDA.device())
-    return CUDA.attribute(dev, CUDA.CU_DEVICE_ATTRIBUTE_MULTIPROCESSOR_COUNT)
-end
-ncudacores(deviceid::Integer) = ncudacores(CuDevice(deviceid))
-function ncudacores(device::CuDevice=CUDA.device())
-    capver = CUDA.capability(device)
-    return ncudacores(capver.major, capver.minor, nmultiprocessors(device))
-end
-function ncudacores(major, minor, mp)
-    # based on https://stackoverflow.com/questions/32530604/how-can-i-get-number-of-cores-in-cuda-device
-    # helper_cuda_drvapi provides something like https://github.com/LinkedInAttic/datacl/blob/master/approxalgos/GPU_Work_Final2/bussAnal/filter/lib/helper_cuda_drvapi.h#L82 but is header only
-    cores = 0
-    err_msg = "Unknown device type / compute capability version (major $major, minor $minor)"
-    if major == 2 # Fermi
-        if minor == 1
-            cores = mp * 48
-        else
-            cores = mp * 32
-        end
-    elseif major == 3 # Kepler
-        cores = mp * 192
-    elseif major == 5 # Maxwell
-        cores = mp * 128
-    elseif major == 6 # Pascal
-        if (minor == 1) || (minor == 2)
-            cores = mp * 128
-        elseif minor == 0
-            cores = mp * 64
-        else
-            error(err_msg)
-        end
-    elseif major == 7 # Volta and Turing
-        if (minor == 0) || (minor == 5)
-            cores = mp * 64
-        else
-            error(err_msg)
-        end
-    elseif major == 8 # Ampere and Ada Lovelace
-        if minor == 0
-            cores = mp * 64
-        elseif minor == 6
-            cores = mp * 128
-        elseif minor == 9
-            cores = mp * 128
-        else
-            error(err_msg)
-        end
-    elseif major == 9 # Hopper
-        if minor == 0
-            cores = mp * 128
-        else
-            error(err_msg)
-        end
-    else
-        error(err_msg)
-    end
-    return cores
-end
-
-function ntensorcores(device::CuDevice=CUDA.device())
-    capver = CUDA.capability(device)
-    return ntensorcores(capver.major, capver.minor, nmultiprocessors(device))
-end
-function ntensorcores(major, minor, mp)
-    # based on https://en.wikipedia.org/wiki/CUDA
-    err_msg = "Unknown device type / compute capability version (major $major, minor $minor)"
-    if major == 7
-        if minor in (0, 2, 5)
-            return 8 * mp
-        else
-            error(err_msg)
-        end
-    elseif major == 8 # Ampere and Ada Lovelace
-        if minor in (0, 6, 7, 9)
-            return 4 * mp
-        else
-            error(err_msg)
-        end
-    elseif major == 9 # Hopper
-        if minor == 0
-            return 4 * mp
-        else
-            error(err_msg)
-        end
-    elseif major < 7
-        return 0
-    else
-        error(err_msg)
-    end
-end
-
-"""
-List the available GPUs.
-"""
-function gpus(; io::IO=stdout)
-    # Based on https://github.com/JuliaGPU/CUDA.jl/blob/ca77d1828f3bc0df34501de848c7a13f1df0b1fe/src/utilities.jl#L69
-    devs = devices()
-    if isempty(devs)
-        println(io, "No CUDA-capable devices.")
-    elseif length(devs) == 1
-        println(io, "1 device:")
-    else
-        println(io, length(devs), " devices:")
-    end
-    for (i, dev) in enumerate(devs)
-        if has_nvml()
-            mig = uuid(dev) != parent_uuid(dev)
-            nvml_gpu = NVML.Device(parent_uuid(dev))
-            nvml_dev = NVML.Device(uuid(dev); mig)
-
-            str = NVML.name(nvml_dev)
-            cap = NVML.compute_capability(nvml_gpu)
-            mem = NVML.memory_info(nvml_dev)
-        else
-            str = name(dev)
-            cap = capability(dev)
-            mem = device!(dev) do
-                # this requires a device context, so we prefer NVML
-                (free=available_memory(), total=total_memory())
-            end
-        end
-        println(
-            io,
-            "  $(i-1): $str (sm_$(cap.major)$(cap.minor), $(Base.format_bytes(mem.free)) / $(Base.format_bytes(mem.total)) available)",
-        )
-    end
 end

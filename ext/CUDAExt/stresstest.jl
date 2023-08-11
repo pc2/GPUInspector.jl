@@ -142,15 +142,3 @@ function _run_stresstests(
     end
     return nothing
 end
-
-# function stresstest_on_worker(devices; verbose=true, worker=first(workers()), duration=nothing, kwargs...)
-#     verbose && @info("Using worker $worker.")
-#     # pid = withenv("JULIA_NUM_THREADS"=>length(devices)) do
-#     #     pid, = addprocs(1, exeflags = "--project=$(Base.active_project())")
-#     #     return pid
-#     # end
-
-#     t = @spawnat worker stresstest(devices; verbose=false, duration, kwargs...)
-#     monitor_temperature(duration+5; liveplot=true)
-#     return fetch(t)
-# end

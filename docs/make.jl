@@ -36,7 +36,6 @@ makedocs(;
             "GPU Monitoring" => "refs/monitoring.md",
             "CUDA Wrappers" => "refs/cuda_wrappers.md",
             "Utility" => "refs/utility.md",
-            "Worker Utilities" => "refs/workers.md",
             "HDF5" => "refs/hdf5.md",
         ],
         "Tested Devices" => [
