@@ -75,7 +75,7 @@ function p2p_bandwidth_all(::CUDABackend; io::IO=stdout, verbose=false, kwargs..
         if src == dst
             nothing
         else
-            p2p_bandwidth(args...; src=src, dst=dst, io=io, verbose=verbose, kwargs...)
+            p2p_bandwidth(CUDABackend(); src=src, dst=dst, io=io, verbose=verbose, kwargs...)
         end for src in 0:(ngpus - 1), dst in 0:(ngpus - 1)
     ]
 end
