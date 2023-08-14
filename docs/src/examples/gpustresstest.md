@@ -6,7 +6,9 @@
 ## Single GPU
 
 ```julia
-julia> stresstest(device(); duration=10)
+julia> using GPUInspector, CUDA
+
+julia> stresstest(; devices=CUDA.device(), duration=10)
 [ Info: Will try to run for approximately 10 seconds on each GPU.
 [ Info: Running StressTest{Float32} on Julia thread 2 and CuDevice(0).
 [ Info: Ran 11241 iterations on CuDevice(0).
@@ -21,9 +23,9 @@ First, make sure to run Julia with enough threads (more or equal to the number o
 In the following example, I started Julia with `julia -t 20` (why not? 😄).
 
 ```julia
-julia> using GPUInspector
+julia> using GPUInspector, CUDA
 
-julia> stresstest(CUDA.devices(); duration=10)
+julia> stresstest(; devices=CUDA.devices(), duration=10)
 [ Info: Will try to run for approximately 10 seconds on each GPU.
 [ Info: Running StressTest{Float32} on Julia thread 2 and CuDevice(0).
 [ Info: Running StressTest{Float32} on Julia thread 8 and CuDevice(6).
@@ -50,12 +52,12 @@ julia> stresstest(CUDA.devices(); duration=10)
 To verify that the GPUs are actually busy you could use external tools like, e.g., `nvidia-smi`. However, we also provide built-in monitoring tools.
 
 ```julia
-julia> using GPUInspector                                                       
-                                                                                    
+julia> using GPUInspector, CUDA
+
 julia> monitoring_start()                                                           
 [ Info: Spawning monitoring on Julia thread 20.
 
-julia> stresstest(devices(); duration=10) # all devices, 10 seconds
+julia> stresstest(; devices=CUDA.devices(), duration=10) # all devices, 10 seconds
 [ Info: Will try to run for approximately 10 seconds on each GPU.
 [ Info: Running StressTest{Float32} on Julia thread 4 and CuDevice(2).
 [ Info: Running StressTest{Float32} on Julia thread 2 and CuDevice(0).

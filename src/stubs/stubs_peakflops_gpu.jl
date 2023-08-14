@@ -1,11 +1,10 @@
 """
-Estimates the theoretical peak performance of a CUDA device in TFLOP/s.
+Estimates the theoretical peak performance of a GPU device in TFLOP/s.
 
 **Keyword arguments:**
-* `tensorcores` (default: `hastensorcores()`): toggle usage of tensore cores. If `false`, cuda cores will be used.
 * `verbose` (default: `true`): toggle printing of information
-* `device` (default: `device()`): CUDA device to be analyzed
-* `dtype` (default: `tensorcores ? Float16 : Float32`): element type of the matrices
+* `device` (default: e.g. `CUDA.device()`): GPU device to be analyzed
+* `dtype` (default: `Float32`): element type of the matrices
 * `io` (default: `stdout`): set the stream where the results should be printed.
 """
 theoretical_peakflops_gpu(; kwargs...) = theoretical_peakflops_gpu(backend(); kwargs...)

@@ -7,6 +7,12 @@ _monitoring!(val::Bool) = MONITORING[] = val
 _set_monitoring_task(t::Task) = MONITORING_TASK[] = t
 _get_monitoring_task() = MONITORING_TASK[]
 
+"""
+Struct to hold the results of monitoring.
+This includes the time points (`times`), the monitored devices (`devices`), as well as
+a dictionary holding the (vector-)values of different quantities (identified by symbols) at
+each of the time points.
+"""
 struct MonitoringResults
     times::Vector{Float64}
     devices::Vector{Tuple{String,UUID}}

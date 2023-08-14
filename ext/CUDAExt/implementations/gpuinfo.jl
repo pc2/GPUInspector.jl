@@ -40,6 +40,8 @@ end
 Print out detailed information about the NVIDIA GPU with the given `deviceid`.
 
 Heavily inspired by the CUDA sample "deviceQueryDrv.cpp".
+
+(This method is from the CUDA backend.)
 """
 function gpuinfo(::CUDABackend, deviceid::Integer; io::IO=stdout)
     0 <= deviceid <= ngpus() - 1 || throw(ArgumentError("Invalid device id."))

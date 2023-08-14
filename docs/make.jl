@@ -1,7 +1,7 @@
-# push!(LOAD_PATH,"../src/")
 using Documenter
 using DocThemePC2
 using GPUInspector
+using CUDA
 using LinearAlgebra
 
 BLAS.set_num_threads(1)
@@ -16,8 +16,9 @@ DocThemePC2.install(@__DIR__)
 makedocs(;
     sitename="GPUInspector.jl",
     authors="Carsten Bauer",
-    modules=[GPUInspector],
+    modules=[GPUInspector, Base.get_extension(GPUInspector, :CUDAExt)],
     checkdocs=:exports,
+    doctest=false,
     pages=[
         "GPUInspector" => "index.md",
         "Examples" => [
@@ -34,9 +35,8 @@ makedocs(;
             "GPU Stress Test" => "refs/gpustresstest.md",
             "CPU Stress Test" => "refs/stresstest_cpu.md",
             "GPU Monitoring" => "refs/monitoring.md",
-            "CUDA Wrappers" => "refs/cuda_wrappers.md",
+            "CUDA Extension" => "refs/cuda_extension.md",
             "Utility" => "refs/utility.md",
-            "HDF5" => "refs/hdf5.md",
         ],
         "Tested Devices" => [
             "A100 SXM2" => "devices/a100_sxm2.md",

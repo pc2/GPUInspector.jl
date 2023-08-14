@@ -1,7 +1,3 @@
-"""
-For CUDABackend:
-* `devices` (default: `CUDA.devices()`): `CuDevice`s or `NVML.Device`s to monitor.
-"""
 function monitoring_start(
     ::CUDABackend; freq=1, devices=CUDA.devices(), thread=Threads.nthreads(), verbose=true
 )
@@ -53,10 +49,12 @@ end
 
 """
     monitoring_stop(; verbose=true) -> results
-For CUDABackend:
+
 Specifically, `results` is a named tuple with the following keys:
 * `time`: the (relative) times at which we measured
 * `temperature`, `power`, `compute`, `mem`
+
+(This method is from the CUDA backend.)
 """
 function monitoring_stop(::CUDABackend; verbose=true)::MonitoringResults
     if ismonitoring()

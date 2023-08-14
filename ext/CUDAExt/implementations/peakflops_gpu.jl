@@ -7,6 +7,8 @@ Estimates the theoretical peak performance of a CUDA device in TFLOP/s.
 * `device` (default: `device()`): CUDA device to be analyzed
 * `dtype` (default: `tensorcores ? Float16 : Float32`): element type of the matrices
 * `io` (default: `stdout`): set the stream where the results should be printed.
+
+(This method is from the CUDA backend.)
 """
 function theoretical_peakflops_gpu(
     ::CUDABackend;

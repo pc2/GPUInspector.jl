@@ -20,6 +20,7 @@ returns an inter-gpu memory bandwidth estimate (in GiB/s) derived from it.
 p2p_bandwidth()
 p2p_bandwidth(MiB(1024))
 p2p_bandwidth(KiB(20_000); dtype=Int32)
+```
 """
 p2p_bandwidth(; kwargs...) = p2p_bandwidth(backend(); kwargs...)
 p2p_bandwidth(::Backend; kwargs...) = not_implemented_yet()

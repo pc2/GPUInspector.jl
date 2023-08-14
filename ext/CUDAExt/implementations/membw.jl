@@ -78,8 +78,10 @@ function memory_bandwidth_scaling(
 end
 
 """
-For CUDABackend:
+Extra keyword arguments:
 * `cublas` (default: `true`): toggle between `CUDA.axpy!` and a custom `_saxpy_gpu_kernel!`.
+
+(This method is from the CUDA backend.)
 """
 function memory_bandwidth_saxpy(
     ::CUDABackend;
