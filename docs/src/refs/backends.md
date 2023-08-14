@@ -11,5 +11,5 @@ Order   = [:function, :type]
 
 ```@autodocs
 Modules = [GPUInspector]
-Pages   = ["backends.jl"]
+Pages   = ["backends.jl", "stubs_general.jl"]
 ```

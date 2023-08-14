@@ -31,6 +31,7 @@ function not_implemented_yet()
         " the loaded backend doesn't provide this functionality.",
     )
 end
+include("stubs/stubs_general.jl")
 include("stubs/stubs_gpuinfo.jl")
 include("stubs/stubs_p2p_bandwidth.jl")
 include("stubs/stubs_host2device_bandwidth.jl")

@@ -24,7 +24,7 @@ using GPUInspector:
     @unroll
 
 # import stubs to implement them
-import GPUInspector: backendinfo
+import GPUInspector: backendinfo, functional
 # gpuinfo
 import GPUInspector: ngpus, gpuinfo, gpuinfo_p2p_access, gpus
 # p2p bw
@@ -63,6 +63,7 @@ include("stresstests.jl")
 include("peakflops_gpu_fmas.jl")
 include("peakflops_gpu_wmmas.jl")
 include("peakflops_gpu_matmul.jl")
+include("implementations/general.jl")
 include("implementations/gpuinfo.jl")
 include("implementations/p2p_bandwidth.jl")
 include("implementations/host2device_bandwidth.jl")

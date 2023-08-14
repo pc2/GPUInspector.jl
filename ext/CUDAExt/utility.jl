@@ -43,34 +43,6 @@ function clear_all_gpus_memory(devices=CUDA.devices(); gc=true)
 end
 
 """
-Check if CUDA/GPU is available and functional.
-If not, print some (hopefully useful) debug information.
-"""
-function functional(verbose=true)
-    if CUDA.functional()
-        verbose && @info("CUDA/GPU available.")
-        hascuda = true
-    else
-        verbose && @info("No CUDA/GPU found.")
-        hascuda = false
-        if verbose
-            # debug information
-            @show Libdl.find_library("libcuda")
-            @show filter(contains("cuda"), lowercase.(Libdl.dllist()))
-            try
-                @info("CUDA.versioninfo():")
-                CUDA.versioninfo()
-                @info("Successful!")
-            catch ex
-                @warn("Unsuccessful!", ex)
-                println()
-            end
-        end
-    end
-    return hascuda
-end
-
-"""
     toggle_tensorcoremath([enable::Bool; verbose=true])
 Switches the `CUDA.math_mode` between `CUDA.FAST_MATH` (`enable=true`) and `CUDA.DEFAULT_MATH` (`enable=false`).
 For matmuls of `CuArray{Float32}`s, this should have the effect of using/enabling and not using/disabling tensor cores.
