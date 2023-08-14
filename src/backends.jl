@@ -1,19 +1,30 @@
+"Abstract Backend for GPUInspector"
 abstract type Backend end
+"Indicates the absence of any GPU backends"
 struct NoBackend <: Backend end
+"Represents the CUDA backend (CUDA.jl)"
 struct CUDABackend <: Backend end
+"Represents the ROC backend (AMDGPU.jl)"
 struct ROCBackend <: Backend end
 
 const BACKEND = Ref{Backend}(NoBackend())
+
+"Returns the currently active GPU backend"
 backend() = BACKEND[]
+"""
+$(TYPEDSIGNATURES)
+Set the GPU backend (manually). Note that the corresponding backend package (e.g. CUDA.jl)
+must already be loaded in the active Julia session (otherwise an exception is thrown).
+"""
 function backend!(b::Backend)
     check_backendpkg_loaded(b)
     BACKEND[] = b
     return nothing
 end
-function backend!(backend::Symbol)
-    if backend in (:cuda, :CUDA)
+function backend!(b::Symbol)
+    if b in (:cuda, :CUDA)
         backend!(CUDABackend())
-    elseif backend in (:roc, :rocm, :ROC, :ROCM, :amd, :AMD)
+    elseif b in (:roc, :rocm, :ROC, :ROCM, :amd, :AMD)
         backend!(ROCBackend())
     else
         throw(ArgumentError("Can't set unknown backend."))
@@ -46,5 +57,9 @@ end
 
 CUDAExt::Union{Nothing,Module} = nothing
 
+"""
+Query information about a specific backend, e.g., what functionality the backend currently
+supports.
+"""
 backendinfo() = backendinfo(backend())
 backendinfo(::Backend) = not_implemented_yet()

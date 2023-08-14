@@ -35,6 +35,7 @@ makedocs(;
             "GPU Stress Test" => "refs/gpustresstest.md",
             "CPU Stress Test" => "refs/stresstest_cpu.md",
             "GPU Monitoring" => "refs/monitoring.md",
+            "Backends" => "refs/backends.md",
             "CUDA Extension" => "refs/cuda_extension.md",
             "Utility" => "refs/utility.md",
         ],
