@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>GPU Information · GPUInspector.jl</title><script data-outdated-warner src="../../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.045/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.24/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script><link href="../../assets/favicon.ico" rel="icon" type="image/x-icon"/></head><body><div id="documenter"><nav class="docs-sidebar"><a class="docs-logo" href="../../"><img src="../../assets/logo.svg" alt="GPUInspector.jl logo"/></a><div class="docs-package-name"><span class="docs-autofit"><a href="../../">GPUInspector.jl</a></span></div><form class="docs-search" action="../../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../../">GPUInspector</a></li><li><input class="collapse-toggle" id="menuitem-2" type="checkbox" checked/><label class="tocitem" for="menuitem-2"><span class="docs-label">Examples</span><i class="docs-chevron"></i></label><ul class="collapsed"><li class="is-active"><a class="tocitem" href>GPU Information</a></li><li><a class="tocitem" href="../data_bandwidth/">Data Bandwidth</a></li><li><a class="tocitem" href="../peakflops_gpu/">Peakflops</a></li><li><a class="tocitem" href="../gpustresstest/">GPU Stress Test</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-3" type="checkbox"/><label class="tocitem" for="menuitem-3"><span class="docs-label">Explanations</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../explanations/dgx/">DGX Details</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-4" type="checkbox"/><label class="tocitem" for="menuitem-4"><span class="docs-label">References</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../refs/gpuinfo/">GPU Information</a></li><li><a class="tocitem" href="../../refs/data_bandwidth/">Data Bandwidth</a></li><li><a class="tocitem" href="../../refs/peakflops_gpu/">Peakflops</a></li><li><a class="tocitem" href="../../refs/gpustresstest/">GPU Stress Test</a></li><li><a class="tocitem" href="../../refs/stresstest_cpu/">CPU Stress Test</a></li><li><a class="tocitem" href="../../refs/monitoring/">GPU Monitoring</a></li><li><a class="tocitem" href="../../refs/backends/">Backends</a></li><li><a class="tocitem" href="../../refs/cuda_extension/">CUDA Extension</a></li><li><a class="tocitem" href="../../refs/utility/">Utility</a></li></ul></li><li><input class="collapse-toggle" id="menuitem-5" type="checkbox"/><label class="tocitem" for="menuitem-5"><span class="docs-label">Tested Devices</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../devices/a100_sxm2/">A100 SXM2</a></li><li><a class="tocitem" href="../../devices/v100_sxm2/">V100 SXM2</a></li><li><a class="tocitem" href="../../devices/geforce_gtx_1650/">GeForce GTX 1650</a></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Examples</a></li><li class="is-active"><a href>GPU Information</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>GPU Information</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com//blob/main/docs/src/examples/gpuinfo.md" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Example:-CUDA/GPU-Information"><a class="docs-heading-anchor" href="#Example:-CUDA/GPU-Information">Example: CUDA/GPU Information</a><a id="Example:-CUDA/GPU-Information-1"></a><a class="docs-heading-anchor-permalink" href="#Example:-CUDA/GPU-Information" title="Permalink"></a></h1><div class="admonition is-info"><header class="admonition-header">Note</header><div class="admonition-body"><p><strong>Test system:</strong> DGX with 8x A100 GPUs</p></div></div><pre><code class="language-julia hljs">julia&gt; gpus()
+8 devices:
+  0: NVIDIA A100-SXM4-40GB (sm_80, 39.583 GiB / 39.586 GiB available)
+  1: NVIDIA A100-SXM4-40GB (sm_80, 39.583 GiB / 39.586 GiB available)
+  2: NVIDIA A100-SXM4-40GB (sm_80, 39.583 GiB / 39.586 GiB available)
+  3: NVIDIA A100-SXM4-40GB (sm_80, 39.583 GiB / 39.586 GiB available)
+  4: NVIDIA A100-SXM4-40GB (sm_80, 39.583 GiB / 39.586 GiB available)
+  5: NVIDIA A100-SXM4-40GB (sm_80, 39.583 GiB / 39.586 GiB available)
+  6: NVIDIA A100-SXM4-40GB (sm_80, 39.583 GiB / 39.586 GiB available)
+  7: NVIDIA A100-SXM4-40GB (sm_80, 39.583 GiB / 39.586 GiB available)</code></pre><p>More specific information for each gpu device can be obtained with <a href="../../refs/cuda_extension/#GPUInspector.gpuinfo-Tuple{CUDABackend, Integer}"><code>gpuinfo(deviceid::Integer)</code></a>.</p><pre><code class="nohighlight hljs">julia&gt; gpuinfo()
+Device: NVIDIA A100-SXM4-40GB (CuDevice(0))
+Total amount of global memory: 42.5 GB
+Number of CUDA cores: 6912
+Number of multiprocessors: 108 (64 CUDA cores each)
+GPU max. clock rate: 1410 Mhz
+Memory clock rate: 1215 Mhz
+Memory bus width: 5120-bit
+L2 cache size: 41.9 MB
+Max. texture dimension sizes (1D): 131072
+Max. texture dimension sizes (2D): 131072, 65536
+Max. texture dimension sizes (3D): 16384, 16384, 16384
+Max. layered 1D texture size: 32768 (2048 layers)
+Max. layered 2D texture size: 32768, 32768 (2048 layers)
+Total amount of constant memory: 65.5 kB
+Total amount of shared memory per block: 49.2 kB
+Total number of registers available per block: 65536
+Warp size: 32
+Max. number of threads per multiprocessor: 2048
+Max. number of threads per block: 1024
+Max. dimension size of a thread block (x,y,z): 1024, 1024, 64
+Max. dimension size of a grid size (x,y,z): 2147483647, 65535, 65535
+Texture alignment: 512.0 B
+Maximum memory pitch: 2.1 GB
+Concurrent copy and kernel execution: Yes with 3 copy engine(s)
+Run time limit on kernels: No
+Integrated GPU sharing host memory: No
+Support host page-locked memory mapping: Yes
+Concurrent kernel execution: Yes
+Alignment requirement for surfaces: Yes
+Device has ECC support: Yes
+Device supports Unified Addressing (UVA): Yes
+Device supports managed memory: Yes
+Device supports compute preemption: Yes
+Supports cooperative kernel launch: Yes
+Supports multi-device co-op kernel launch: Yes
+Device PCI domain ID / bus ID / device ID: 0 / 7 / 0
+Compute mode: Default (multiple host threads can use ::cudaSetDevice() with device simultaneously)</code></pre><p>Peer-to-peer access information can be retrived via <a href="../../refs/gpuinfo/#GPUInspector.gpuinfo_p2p_access-Tuple{}"><code>gpuinfo_p2p_access</code></a>.</p><pre><code class="language-julia hljs">julia&gt; gpuinfo_p2p_access()
+P2P Access Supported:
+8×8 Matrix{Bool}:
+ 0  1  1  1  1  1  1  1
+ 1  0  1  1  1  1  1  1
+ 1  1  0  1  1  1  1  1
+ 1  1  1  0  1  1  1  1
+ 1  1  1  1  0  1  1  1
+ 1  1  1  1  1  0  1  1
+ 1  1  1  1  1  1  0  1
+ 1  1  1  1  1  1  1  0
+
+P2P Atomic Supported:
+8×8 Matrix{Bool}:
+ 0  1  1  1  1  1  1  1
+ 1  0  1  1  1  1  1  1
+ 1  1  0  1  1  1  1  1
+ 1  1  1  0  1  1  1  1
+ 1  1  1  1  0  1  1  1
+ 1  1  1  1  1  0  1  1
+ 1  1  1  1  1  1  0  1
+ 1  1  1  1  1  1  1  0</code></pre><p>Turns out that using <a href="https://nw.tsuda.ac.jp/lec/cuda/doc_v9_0/html/cuda-driver-api/group__CUDA__TYPES.html#group__CUDA__TYPES_1gg578d7cf687ce20f7e99468e8c14e22dec7e28aec0cd03c462a49d00d1b145f46"><code>CU_DEVICE_P2P_ATTRIBUTE_ACCESS_SUPPORTED</code></a> or <a href="https://nw.tsuda.ac.jp/lec/cuda/doc_v9_0/html/cuda-driver-api/group__CUDA__PEER__ACCESS.html#group__CUDA__PEER__ACCESS_1g496bdaae1f632ebfb695b99d2c40f19e"><code>cuDeviceCanAccessPeer</code></a> to query p2p access support may lead to different results (see <a href="https://stackoverflow.com/questions/40258476/whats-the-difference-between-cudevicecanaccesspeer-and-cudevicegetp2pattri">this</a> stackoverflow thread). In <code>gpuinfo_p2p_access()</code> we use both methods and, if the results were to be different, we print both matrices (not shown above).</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../../">« GPUInspector</a><a class="docs-footer-nextpage" href="../data_bandwidth/">Data Bandwidth »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.25 on <span class="colophon-date" title="Monday 14 August 2023 17:28">Monday 14 August 2023</span>. Using Julia version 1.9.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
