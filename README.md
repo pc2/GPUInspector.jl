@@ -40,19 +40,19 @@ The package is registered in the General registry and can readily be added by us
 ] add GPUInspector
 ```
 
-**Note:** The recommended Julia version is >= 1.9.
-
 ## Example
 
 The package allows you to do various tests and benchmarks. Below we show a demonstrate a little stress test which lets a few A100 GPUs "burn" (i.e. lets them perform computations at close to peak performance) and monitors a few key metrics, such as power usage, temperature, and utilization, at the same time.
 
 ```julia
-julia> using GPUInspector                                                       
-                                                                                    
+julia> using GPUInspector
+
+julia> using CUDA # loading a GPU backend
+
 julia> monitoring_start()                                                           
 [ Info: Spawning monitoring on Julia thread 20.
 
-julia> stresstest(devices(); duration=10) # all devices, 10 seconds
+julia> stresstest(; devices=CUDA.devices(), duration=10) # all devices, 10 seconds
 [ Info: Will try to run for approximately 10 seconds on each GPU.
 [ Info: Running StressTest{Float32} on Julia thread 4 and CuDevice(2).
 [ Info: Running StressTest{Float32} on Julia thread 2 and CuDevice(0).
