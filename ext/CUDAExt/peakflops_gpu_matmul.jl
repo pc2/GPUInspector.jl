@@ -4,8 +4,8 @@ Asserts the scaling of the given `peakflops_func`tion (defaults to [`peakflops_g
 with increasing matrix size. If `verbose=true` (default), displays a unicode plot. Returns
 the considered sizes and TFLOP/s. For further options, see [`peakflops_gpu_matmul`](@ref).
 """
-function peakflops_gpu_matmul_scaling(
-    peakflops_func::F=peakflops_gpu_matmul;
+function _peakflops_gpu_matmul_scaling(
+    peakflops_func::F=_peakflops_gpu_matmul;
     device=CUDA.device(),
     verbose=true,
     sizes=2 .^ (10:15),
@@ -55,9 +55,9 @@ it takes to perform `nmatmuls` many (in-place) matrix-matrix multiplications.
 * `verbose` (default: `true`): toggle printing.
 * `io` (default: `stdout`): set the stream where the results should be printed.
 
-See also: [`peakflops_gpu_matmul_scaling`](@ref), [`peakflops_gpu_matmul_graphs`](@ref).
+See also: [`_peakflops_gpu_matmul_scaling`](@ref), [`_peakflops_gpu_matmul_graphs`](@ref).
 """
-function peakflops_gpu_matmul(;
+function _peakflops_gpu_matmul(;
     device=CUDA.device(),
     dtype=Float32,
     size=2^14,
@@ -97,11 +97,11 @@ function peakflops_gpu_matmul(;
 end
 
 """
-Same as [`peakflops_gpu_matmul`](@ref) but uses CUDA's graph API to define and launch the kernel.
+Same as [`_peakflops_gpu_matmul`](@ref) but uses CUDA's graph API to define and launch the kernel.
 
-See also: [`peakflops_gpu_matmul_scaling`](@ref).
+See also: [`_peakflops_gpu_matmul_scaling`](@ref).
 """
-function peakflops_gpu_matmul_graphs(;
+function _peakflops_gpu_matmul_graphs(;
     device=CUDA.device(),
     dtype=Float32,
     size=2^14,

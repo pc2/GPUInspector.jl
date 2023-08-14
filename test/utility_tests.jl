@@ -66,13 +66,14 @@
 end
 
 @testitem "toggle_tensorcoremath" begin
-    @test isnothing(toggle_tensorcoremath(true; verbose=false))
+    using CUDA
+    @test isnothing(CUDAExt.toggle_tensorcoremath(true; verbose=false))
     @test CUDA.math_mode() == CUDA.FAST_MATH
-    @test isnothing(toggle_tensorcoremath(false; verbose=false))
+    @test isnothing(CUDAExt.toggle_tensorcoremath(false; verbose=false))
     @test CUDA.math_mode() == CUDA.DEFAULT_MATH
     # test toggle
-    @test isnothing(toggle_tensorcoremath(; verbose=false))
+    @test isnothing(CUDAExt.toggle_tensorcoremath(; verbose=false))
     @test CUDA.math_mode() == CUDA.FAST_MATH
-    @test isnothing(toggle_tensorcoremath(; verbose=false))
+    @test isnothing(CUDAExt.toggle_tensorcoremath(; verbose=false))
     @test CUDA.math_mode() == CUDA.DEFAULT_MATH
 end

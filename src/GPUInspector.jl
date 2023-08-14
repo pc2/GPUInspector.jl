@@ -37,6 +37,7 @@ include("stubs/stubs_host2device_bandwidth.jl")
 include("stubs/stubs_membw.jl")
 include("stubs/stubs_stresstest.jl")
 include("stubs/stubs_monitoring.jl")
+include("stubs/stubs_peakflops_gpu.jl")
 
 # backends
 export Backend, NoBackend, CUDABackend, ROCBackend, backend, backend!, backendinfo
@@ -49,6 +50,8 @@ export plot_monitoring_results, load_monitoring_results, save_monitoring_results
 export UnitPrefixedBytes,
     B, KB, MB, GB, TB, KiB, MiB, GiB, TiB, bytes, simplify, change_base, value
 export logspace
+
+# export stresstest_cpu
 
 # stubs gpuinfo
 export ngpus, gpuinfo, gpuinfo_p2p_access, gpus
@@ -73,6 +76,8 @@ export MonitoringResults,
     livemonitor_powerusage,
     livemonitor_something,
     livemonitor_temperature
+# stubs peakflops_gpu
+export peakflops_gpu, theoretical_peakflops_gpu
 
 # export get_temperatures, get_power_usages, get_gpu_utilizations
 # export clear_gpu_memory,
@@ -97,7 +102,6 @@ export MonitoringResults,
 #     p2p_bandwidth_all, p2p_bandwidth_bidirectional, p2p_bandwidth_bidirectional_all
 # export host2device_bandwidth
 # export stresstest
-export stresstest_cpu
 # export peakflops_gpu,
 #     peakflops_gpu_fmas,
 #     peakflops_gpu_wmmas,

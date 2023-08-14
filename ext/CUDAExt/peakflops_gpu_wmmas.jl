@@ -1,6 +1,6 @@
 _kernel_wmma_nwmmas()::Int = 10_000
 
-function kernel_wmma_f16(a_dev, b_dev, c_dev, d_dev)
+function _kernel_wmma_f16(a_dev, b_dev, c_dev, d_dev)
     conf16 = WMMA.Config{16,16,16,Float16}
     conf32 = WMMA.Config{16,16,16,Float32}
 
@@ -16,7 +16,7 @@ function kernel_wmma_f16(a_dev, b_dev, c_dev, d_dev)
     return nothing
 end
 
-function kernel_wmma_f16_lowlevel(a_dev, b_dev, c_dev, d_dev)
+function _kernel_wmma_f16_lowlevel(a_dev, b_dev, c_dev, d_dev)
     a_frag = WMMA.llvm_wmma_load_a_col_m16n16k16_global_stride_f16(pointer(a_dev), 16)
     b_frag = WMMA.llvm_wmma_load_b_col_m16n16k16_global_stride_f16(pointer(b_dev), 16)
     c_frag = WMMA.llvm_wmma_load_c_col_m16n16k16_global_stride_f32(pointer(c_dev), 16)
@@ -29,7 +29,7 @@ function kernel_wmma_f16_lowlevel(a_dev, b_dev, c_dev, d_dev)
     return nothing
 end
 
-function kernel_wmma_int8_lowlevel(a_dev, b_dev, c_dev, d_dev)
+function _kernel_wmma_int8_lowlevel(a_dev, b_dev, c_dev, d_dev)
     a_frag = WMMA.llvm_wmma_load_a_col_m16n16k16_global_stride_s8(pointer(a_dev), 16)
     b_frag = WMMA.llvm_wmma_load_b_col_m16n16k16_global_stride_s8(pointer(b_dev), 16)
     c_frag = WMMA.llvm_wmma_load_c_col_m16n16k16_global_stride_s32(pointer(c_dev), 16)
@@ -42,7 +42,7 @@ function kernel_wmma_int8_lowlevel(a_dev, b_dev, c_dev, d_dev)
     return nothing
 end
 
-function kernel_wmma_tf32_lowlevel(a_dev, b_dev, c_dev, d_dev)
+function _kernel_wmma_tf32_lowlevel(a_dev, b_dev, c_dev, d_dev)
     a_frag = WMMA.llvm_wmma_load_a_col_m16n16k8_global_stride_tf32(pointer(a_dev), 16)
     b_frag = WMMA.llvm_wmma_load_b_col_m16n16k8_global_stride_tf32(pointer(b_dev), 8)
     c_frag = WMMA.llvm_wmma_load_c_col_m16n16k8_global_stride_f32(pointer(c_dev), 16)
@@ -55,7 +55,7 @@ function kernel_wmma_tf32_lowlevel(a_dev, b_dev, c_dev, d_dev)
     return nothing
 end
 
-function kernel_wmma_bf16_lowlevel(a_dev, b_dev, c_dev, d_dev)
+function _kernel_wmma_bf16_lowlevel(a_dev, b_dev, c_dev, d_dev)
     a_frag = WMMA.llvm_wmma_load_a_col_m16n16k16_global_stride_bf16(pointer(a_dev), 16)
     b_frag = WMMA.llvm_wmma_load_b_col_m16n16k16_global_stride_bf16(pointer(b_dev), 16)
     c_frag = WMMA.llvm_wmma_load_c_col_m16n16k16_global_stride_f32(pointer(c_dev), 16)
@@ -69,7 +69,7 @@ function kernel_wmma_bf16_lowlevel(a_dev, b_dev, c_dev, d_dev)
 end
 
 """
-    peakflops_gpu_wmmas()
+    _peakflops_gpu_wmmas()
 Tries to estimate the peak performance of a GPU in TFLOP/s by measuring the time
 it takes to perform `_kernel_wmma_nwmmas()` many WMMAs on Tensor Cores.
 
@@ -83,7 +83,7 @@ it takes to perform `_kernel_wmma_nwmmas()` many WMMAs on Tensor Cores.
 * `verbose` (default: `true`): toggle printing.
 * `io` (default: `stdout`): set the stream where the results should be printed.
 """
-function peakflops_gpu_wmmas(;
+function _peakflops_gpu_wmmas(;
     device::CuDevice=CUDA.device(),
     blocks=2048,
     threads=CUDA.attribute(device, CUDA.CU_DEVICE_ATTRIBUTE_MAX_THREADS_PER_BLOCK),
@@ -155,15 +155,15 @@ function peakflops_gpu_wmmas(;
         d_d = CUDA.zeros(dtype_d, m, n)
 
         if Symbol(dtype) == :Float16
-            kernel = @cuda launch = false kernel_wmma_f16(d_a, d_b, d_c, d_d)
+            kernel = @cuda launch = false _kernel_wmma_f16(d_a, d_b, d_c, d_d)
         elseif Symbol(dtype) == :Float16_lowlevel
-            kernel = @cuda launch = false kernel_wmma_f16_lowlevel(d_a, d_b, d_c, d_d)
+            kernel = @cuda launch = false _kernel_wmma_f16_lowlevel(d_a, d_b, d_c, d_d)
         elseif Symbol(dtype) == :Int8
-            kernel = @cuda launch = false kernel_wmma_int8_lowlevel(d_a, d_b, d_c, d_d)
+            kernel = @cuda launch = false _kernel_wmma_int8_lowlevel(d_a, d_b, d_c, d_d)
         elseif Symbol(dtype) in (:Float32, :TensorFloat32, :TF32)
-            kernel = @cuda launch = false kernel_wmma_tf32_lowlevel(d_a, d_b, d_c, d_d)
+            kernel = @cuda launch = false _kernel_wmma_tf32_lowlevel(d_a, d_b, d_c, d_d)
         elseif Symbol(dtype) in (:BFloat16, :BF16)
-            kernel = @cuda launch = false kernel_wmma_bf16_lowlevel(d_a, d_b, d_c, d_d)
+            kernel = @cuda launch = false _kernel_wmma_bf16_lowlevel(d_a, d_b, d_c, d_d)
         else
             throw(ArgumentError("Unsupported dtype."))
         end

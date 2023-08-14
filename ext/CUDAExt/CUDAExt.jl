@@ -20,7 +20,8 @@ using GPUInspector:
     _set_monitoring_task,
     _get_monitoring_task,
     MonitoringResults,
-    _defaultylims
+    _defaultylims,
+    @unroll
 
 # import stubs to implement them
 import GPUInspector: backendinfo
@@ -50,19 +51,25 @@ import GPUInspector:
     livemonitor_something,
     livemonitor_powerusage,
     livemonitor_temperature
+# peakflops_gpu
+import GPUInspector: peakflops_gpu, theoretical_peakflops_gpu
 
 # for convenience
 const BFloat16 = CUDA.BFloat16
 
 include("cuda_wrappers.jl")
 include("utility.jl")
+include("stresstests.jl")
+include("peakflops_gpu_fmas.jl")
+include("peakflops_gpu_wmmas.jl")
+include("peakflops_gpu_matmul.jl")
 include("implementations/gpuinfo.jl")
 include("implementations/p2p_bandwidth.jl")
 include("implementations/host2device_bandwidth.jl")
 include("implementations/membw.jl")
 include("implementations/stresstest.jl")
-include("implementations/stresstest_tests.jl")
 include("implementations/monitoring.jl")
+include("implementations/peakflops_gpu.jl")
 
 function __init__()
     GPUInspector.CUDAJL_LOADED[] = true
