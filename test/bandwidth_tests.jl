@@ -1,12 +1,13 @@
 @testitem "p2p_bandwidth" begin
     using LinearAlgebra
+    using CUDA
 
     @testset "unidirectional" begin
         # p2p_bandwidth
         @test typeof(p2p_bandwidth(; verbose=false)) == Float64
         @test 0 ≤ p2p_bandwidth(; verbose=false)
         # options
-        @test typeof(p2p_bandwidth(MB(100); verbose=false)) == Float64
+        @test typeof(p2p_bandwidth(; memsize=MB(100), verbose=false)) == Float64
         @test typeof(p2p_bandwidth(; src=CuDevice(0), dst=CuDevice(1), verbose=false)) ==
             Float64
         @test typeof(p2p_bandwidth(; dtype=Float16, verbose=false)) == Float64
@@ -25,7 +26,7 @@
         @test typeof(p2p_bandwidth_bidirectional(; verbose=false)) == Float64
         @test 0 ≤ p2p_bandwidth_bidirectional(; verbose=false)
         # options
-        @test typeof(p2p_bandwidth_bidirectional(MB(100); verbose=false)) == Float64
+        @test typeof(p2p_bandwidth_bidirectional(; memsize=MB(100), verbose=false)) == Float64
         @test typeof(p2p_bandwidth_bidirectional(; dtype=Float16, verbose=false)) == Float64
         @test typeof(p2p_bandwidth_bidirectional(; nbench=10, verbose=false)) == Float64
         @test typeof(p2p_bandwidth_bidirectional(; hist=true, verbose=true)) == Float64
@@ -41,14 +42,16 @@
 end
 
 @testitem "host2device_bandwidth" begin
+    using CUDA
     @test isnothing(host2device_bandwidth())
-    @test isnothing(host2device_bandwidth(MB(100)))
+    @test isnothing(host2device_bandwidth(; memsize=MB(100)))
     @test isnothing(host2device_bandwidth(; dtype=Float16))
 end
 
 @testitem "memory_bandwidth" begin
+    using CUDA
     @test typeof(memory_bandwidth()) == Float64
-    @test typeof(memory_bandwidth(MiB(10))) == Float64
+    @test typeof(memory_bandwidth(; memsize=MiB(10))) == Float64
     @test typeof(memory_bandwidth(; dtype=Float32)) == Float64
 
     @test typeof(memory_bandwidth_saxpy()) == Float64

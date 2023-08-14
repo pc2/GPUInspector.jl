@@ -7,15 +7,14 @@ using LinearAlgebra
 using Libdl
 using Base: UUID
 using Pkg: Pkg
-using Logging
-using DocStringExtensions
 
 # external
 using Reexport
 @reexport using ThreadPinning
+using DocStringExtensions
+using UnicodePlots
 using CpuId: cachesize
 using HDF5: h5open
-using UnicodePlots: UnicodePlots
 using Glob: glob
 
 include("backends.jl")
@@ -24,7 +23,7 @@ include("utility.jl")
 include("utility_unroll.jl")
 include("stresstest_cpu.jl")
 include("monitoring.jl")
-include("hdf5.jl")
+include("monitoring_io.jl")
 
 function not_implemented_yet()
     return error(
@@ -36,10 +35,20 @@ include("stubs/stubs_gpuinfo.jl")
 include("stubs/stubs_p2p_bandwidth.jl")
 include("stubs/stubs_host2device_bandwidth.jl")
 include("stubs/stubs_membw.jl")
+include("stubs/stubs_stresstest.jl")
+include("stubs/stubs_monitoring.jl")
 
 # backends
-export Backend, CUDABackend, ROCBackend, backend, backend!
+export Backend, NoBackend, CUDABackend, ROCBackend, backend, backend!, backendinfo
 export CUDAExt
+
+# monitoring io+plotting
+export plot_monitoring_results, load_monitoring_results, save_monitoring_results
+
+# utilities
+export UnitPrefixedBytes,
+    B, KB, MB, GB, TB, KiB, MiB, GiB, TiB, bytes, simplify, change_base, value
+export logspace
 
 # stubs gpuinfo
 export ngpus, gpuinfo, gpuinfo_p2p_access, gpus
@@ -54,10 +63,17 @@ export theoretical_memory_bandwidth,
     memory_bandwidth_scaling,
     memory_bandwidth_saxpy,
     memory_bandwidth_saxpy_scaling
+# stubs stresstest
+export stresstest
+# stubs monitoring
+export MonitoringResults,
+    monitoring_start,
+    monitoring_stop,
+    savefig_monitoring_results,
+    livemonitor_powerusage,
+    livemonitor_something,
+    livemonitor_temperature
 
-# UnitPrefixedBytes
-export UnitPrefixedBytes,
-    B, KB, MB, GB, TB, KiB, MiB, GiB, TiB, bytes, simplify, change_base, value
 # export get_temperatures, get_power_usages, get_gpu_utilizations
 # export clear_gpu_memory,
 #     clear_all_gpus_memory,
@@ -68,7 +84,7 @@ export UnitPrefixedBytes,
 #     MultiLogger,
 #     multi_log
 # export get_cpusocket_temperatures, get_cpu_utilizations, get_cpu_utilization
-export logspace
+
 # export MonitoringResults,
 #     monitoring_start,
 #     monitoring_stop,

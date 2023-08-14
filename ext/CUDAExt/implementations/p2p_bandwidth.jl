@@ -75,7 +75,9 @@ function p2p_bandwidth_all(::CUDABackend; io::IO=stdout, verbose=false, kwargs..
         if src == dst
             nothing
         else
-            p2p_bandwidth(CUDABackend(); src=src, dst=dst, io=io, verbose=verbose, kwargs...)
+            p2p_bandwidth(
+                CUDABackend(); src=src, dst=dst, io=io, verbose=verbose, kwargs...
+            )
         end for src in 0:(ngpus - 1), dst in 0:(ngpus - 1)
     ]
 end
@@ -179,7 +181,7 @@ function _perform_p2p_memcpy_bidirectional(dev1, mem_dev1, dev2, mem_dev2; repea
         # Block the stream until all the work is queued up
         # delay_flag = Ref(false)
         # device!(dev1)
-        # @cuda stream=stream1 delay(delay_flag)
+        # @cuda stream=stream1 _delay(delay_flag)
 
         # Force stream2 not to start until stream1 does, in order to ensure
         # the events on stream1 fully encompass the time needed for all
@@ -223,7 +225,7 @@ end
 end
 
 ## delay kernel (Warning: not sure the ref flag is working as intended!)
-function delay(delay_flag, timeout_clocks=10_000_000)
+function _delay(delay_flag, timeout_clocks=10_000_000)
     # Wait until the application notifies us that it has completed queuing up the
     # experiment, or timeout and exit, allowing the application to make progress
     start_clock = CUDA.clock(UInt64)

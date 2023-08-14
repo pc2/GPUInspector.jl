@@ -16,6 +16,7 @@ end
 
 @run_package_tests
 
+include("backend_tests.jl")
 include("utility_tests.jl")
 include("stresstest_tests.jl")
 include("bandwidth_tests.jl")

@@ -11,11 +11,12 @@ gpus(; kwargs...) = gpus(backend(); kwargs...)
 gpus(::Backend; kwargs...) = not_implemented_yet()
 
 """
-  gpuinfo(deviceid::Integer; kwargs...)
+  gpuinfo([device]; kwargs...)
 Print out detailed information about the GPU with the given device id.
 
 **Note:** Device ids start at zero!
 """
+gpuinfo(; kwargs...) = gpuinfo(backend(); kwargs...)
 gpuinfo(deviceid::Integer; kwargs...) = gpuinfo(backend(), deviceid; kwargs...)
 gpuinfo(device; kwargs...) = gpuinfo(backend(), device; kwargs...)
 gpuinfo(::Backend, device; kwargs...) = not_implemented_yet()

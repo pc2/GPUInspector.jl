@@ -38,3 +38,58 @@ function Base.:(==)(r1::MonitoringResults, r2::MonitoringResults)
     end
     return equal
 end
+
+"""
+    plot_monitoring_results(r::MonitoringResults, symbols=keys(r.results))
+Plot the quantities specified through `symbols` of a `MonitoringResults` object.
+Will generate a textual in-terminal / in-logfile plot using UnicodePlots.jl.
+"""
+function plot_monitoring_results(r::MonitoringResults, symbols=keys(r.results))
+    for s in symbols
+        display(plot_monitoring_results(r, s))
+    end
+    return nothing
+end
+
+function plot_monitoring_results(r::MonitoringResults, s::Symbol)
+    println() # top margin
+    times = r.times
+    values = r.results[s]
+    title, ylabel = _symbol2title_and_label(s)
+    ylims = _defaultylims(values)
+    device_labels = [str for (str, uuid) in r.devices]
+
+    p = UnicodePlots.lineplot(
+        times,
+        getindex.(values, 1);
+        title=title,
+        xlabel="Time [s]",
+        ylabel=ylabel,
+        name=device_labels[1],
+        ylim=ylims,
+    )
+    for i in 2:length(first(values))
+        UnicodePlots.lineplot!(p, times, getindex.(values, i); name=device_labels[i])
+    end
+    return p
+end
+
+function _defaultylims(values)
+    total_max = maximum(maximum(vs) for vs in values)
+    total_min = minimum(minimum(vs) for vs in values)
+    return (floor(Int, total_min * 0.95), ceil(Int, total_max * 1.05))
+end
+
+function _symbol2title_and_label(s::Symbol)
+    if s == :temperature
+        return "GPU Temperature", "T [C]"
+    elseif s == :power
+        return "GPU Power Usage", "P [W]"
+    elseif s == :compute
+        return "GPU Utilization (Compute)", "U [%]"
+    elseif s == :mem
+        return "GPU Utilization (Memory)", "U [%]"
+    else
+        return "", "Values"
+    end
+end

@@ -7,7 +7,8 @@ const BACKEND = Ref{Backend}(NoBackend())
 backend() = BACKEND[]
 function backend!(b::Backend)
     check_backendpkg_loaded(b)
-    return BACKEND[] = b
+    BACKEND[] = b
+    return nothing
 end
 function backend!(backend::Symbol)
     if backend in (:cuda, :CUDA)
@@ -43,4 +44,7 @@ function check_backend(b::Backend)
     end
 end
 
-CUDAExt::Union{Nothing, Module} = nothing
+CUDAExt::Union{Nothing,Module} = nothing
+
+backendinfo() = backendinfo(backend())
+backendinfo(::Backend) = not_implemented_yet()

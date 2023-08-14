@@ -1,12 +1,29 @@
 module CUDAExt
 
 using GPUInspector
-using GPUInspector: logspace
 using CUDA
+
+# stdlibs etc.
+using Base: UUID
 using Statistics
+using Logging
+using LinearAlgebra
+
+# pkgs
 using UnicodePlots
 
+# for usage in CUDAExt
+using GPUInspector:
+    logspace,
+    ismonitoring,
+    _monitoring!,
+    _set_monitoring_task,
+    _get_monitoring_task,
+    MonitoringResults,
+    _defaultylims
+
 # import stubs to implement them
+import GPUInspector: backendinfo
 # gpuinfo
 import GPUInspector: ngpus, gpuinfo, gpuinfo_p2p_access, gpus
 # p2p bw
@@ -24,25 +41,64 @@ import GPUInspector:
     memory_bandwidth_scaling,
     memory_bandwidth_saxpy,
     memory_bandwidth_saxpy_scaling
+# stresstest
+import GPUInspector: stresstest
+# monitoring
+import GPUInspector:
+    monitoring_start,
+    monitoring_stop,
+    livemonitor_something,
+    livemonitor_powerusage,
+    livemonitor_temperature
 
-# ...
+# for convenience
+const BFloat16 = CUDA.BFloat16
+
 include("cuda_wrappers.jl")
 include("utility.jl")
 include("implementations/gpuinfo.jl")
 include("implementations/p2p_bandwidth.jl")
 include("implementations/host2device_bandwidth.jl")
 include("implementations/membw.jl")
-
-# export BFloat16 for convenience
-const BFloat16 = CUDA.BFloat16
+include("implementations/stresstest.jl")
+include("implementations/stresstest_tests.jl")
+include("implementations/monitoring.jl")
 
 function __init__()
-    if CUDA.functional()
-        toggle_tensorcoremath(true; verbose=false) # by default, use CUDA.FAST_MATH
-    end
     GPUInspector.CUDAJL_LOADED[] = true
     GPUInspector.backend!(:cuda)
-    return GPUInspector.CUDAExt = Base.get_extension(GPUInspector, :CUDAExt)
+    GPUInspector.CUDAExt = Base.get_extension(GPUInspector, :CUDAExt)
+
+    # by default, use CUDA.FAST_MATH
+    if CUDA.functional()
+        toggle_tensorcoremath(true; verbose=false)
+    end
+    return nothing
 end
 
+function backendinfo(::CUDABackend)
+    # somewhat crude way to figure out which API functions are implemented :)
+    funcs = String[]
+    impl_dir = joinpath(@__DIR__, "implementations/")
+    for f in readdir(impl_dir)
+        lines = readlines(joinpath(impl_dir, f))
+        func_lines = filter(startswith("function"), lines)
+        for fl in func_lines
+            fname = strip(split(split(fl, "function")[2], "(")[1])
+            if startswith(fname, "_") || startswith(fname, "Base")
+                continue
+            end
+            if fname in funcs # avoid duplicates
+                continue
+            end
+            push!(funcs, fname)
+        end
+    end
+    println("Implementend API functions for CUDABackend:")
+    for f in funcs
+        println("\t", f)
+    end
+    return nothing
 end
+
+end # module
