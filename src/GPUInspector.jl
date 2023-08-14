@@ -20,6 +20,7 @@ using Glob: glob
 
 include("backends.jl")
 include("UnitPrefixedBytes.jl")
+include("utility.jl")
 include("utility_unroll.jl")
 include("stresstest_cpu.jl")
 include("monitoring.jl")
@@ -31,9 +32,10 @@ function not_implemented_yet()
         " the loaded backend doesn't provide this functionality.",
     )
 end
-include("stubs_gpuinfo.jl")
-include("stubs_p2p_bandwidth.jl")
-include("stubs_host2device_bandwidth.jl")
+include("stubs/stubs_gpuinfo.jl")
+include("stubs/stubs_p2p_bandwidth.jl")
+include("stubs/stubs_host2device_bandwidth.jl")
+include("stubs/stubs_membw.jl")
 
 # backends
 export Backend, CUDABackend, ROCBackend, backend, backend!
@@ -46,6 +48,12 @@ export p2p_bandwidth,
     p2p_bandwidth_all, p2p_bandwidth_bidirectional, p2p_bandwidth_bidirectional_all
 # stubs p2p bandwidth
 export host2device_bandwidth
+# stubs memory bandwidth
+export theoretical_memory_bandwidth,
+    memory_bandwidth,
+    memory_bandwidth_scaling,
+    memory_bandwidth_saxpy,
+    memory_bandwidth_saxpy_scaling
 
 # UnitPrefixedBytes
 export UnitPrefixedBytes,

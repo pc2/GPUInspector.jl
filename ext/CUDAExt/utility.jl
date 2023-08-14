@@ -23,24 +23,24 @@ function alloc_mem(memsize::UnitPrefixedBytes; devs=(CUDA.device(),), dtype=Floa
 end
 
 # TODO: Maybe make API/stub?
-# "Reclaim the unused memory of the currently active GPU (i.e. `device()`)."
-# function clear_gpu_memory(device::CuDevice=CUDA.device(); gc=true)
-#     device!(device) do
-#         gc && GC.gc()
-#         CUDA.reclaim()
-#     end
-#     return nothing
-# end
+"Reclaim the unused memory of the currently active GPU (i.e. `device()`)."
+function clear_gpu_memory(device::CuDevice=CUDA.device(); gc=true)
+    device!(device) do
+        gc && GC.gc()
+        CUDA.reclaim()
+    end
+    return nothing
+end
 
 # TODO: Maybe make API/stub?
-# "Reclaim the unused memory of all available GPUs."
-# function clear_all_gpus_memory(devices=CUDA.devices(); gc=true)
-#     gc && GC.gc()
-#     for dev in devices
-#         clear_gpu_memory(dev; gc=false)
-#     end
-#     return nothing
-# end
+"Reclaim the unused memory of all available GPUs."
+function clear_all_gpus_memory(devices=CUDA.devices(); gc=true)
+    gc && GC.gc()
+    for dev in devices
+        clear_gpu_memory(dev; gc=false)
+    end
+    return nothing
+end
 
 # """
 # Check if CUDA/GPU is available and functional.
@@ -174,10 +174,6 @@ end
 # Checks whether the given `CuDevice` has Tensor Cores.
 # """
 # hastensorcores(dev::CuDevice=CUDA.device()) = ntensorcores(dev) > 0
-
-# function logspace(start, stop, length)
-#     return exp2.(range(log2(start), log2(stop); length=length))
-# end
 
 # function pkgversion(pkg::Module)
 #     return Pkg.Types.read_project(joinpath(Base.pkgdir(pkg), "Project.toml")).version
