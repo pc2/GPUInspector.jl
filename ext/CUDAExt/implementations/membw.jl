@@ -23,7 +23,7 @@ function memory_bandwidth(
     device=CUDA.device(),
     io::IO=stdout,
     kwargs...,
-)
+)::Float64
     device!(device) do
         N = Int(bytes(memsize) ÷ sizeof(dtype))
         mem_gpu = CUDA.rand(dtype, N)
@@ -74,7 +74,7 @@ function memory_bandwidth_scaling(
         println(io, p)
         println(io) # bottom margin
     end
-    return sizes, bandwidths
+    return (sizes=sizes, bandwidths=bandwidths)
 end
 
 """
@@ -92,7 +92,7 @@ function memory_bandwidth_saxpy(
     cublas=true,
     verbose=true,
     io::IO=stdout,
-)
+)::Float64
     device!(device) do
         a = dtype(pi)
         x = CUDA.rand(dtype, size)
@@ -142,8 +142,8 @@ function memory_bandwidth_saxpy_scaling(
     # sizes = [2^20 * i for i in 8:128] # V100
     bandwidths = zeros(length(sizes))
     for (i, s) in enumerate(sizes)
-        bandwidths[i] = memory_bandwidth_saxpy(CUDABackend();
-            device=device, size=s, verbose=false, kwargs...
+        bandwidths[i] = memory_bandwidth_saxpy(
+            CUDABackend(); device=device, size=s, verbose=false, kwargs...
         )
         clear_gpu_memory(device)
     end
@@ -165,5 +165,5 @@ function memory_bandwidth_saxpy_scaling(
         println(io, p)
         println(io) # bottom margin
     end
-    return sizes, bandwidths
+    return (sizes=sizes, bandwidths=bandwidths)
 end
