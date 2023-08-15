@@ -52,6 +52,7 @@ export UnitPrefixedBytes,
     B, KB, MB, GB, TB, KiB, MiB, GiB, TiB, bytes, simplify, change_base, value
 export logspace
 
+# Let's currently not export the CPU tests. After all, this is GPUInspector.jl :)
 # export stresstest_cpu
 
 # stubs gpuinfo
@@ -79,42 +80,5 @@ export MonitoringResults,
     livemonitor_temperature
 # stubs peakflops_gpu
 export peakflops_gpu, theoretical_peakflops_gpu
-
-# export get_temperatures, get_power_usages, get_gpu_utilizations
-# export clear_gpu_memory,
-#     clear_all_gpus_memory,
-#     cublasGemmEx_wrapper!,
-#     cublasGemmEx_wrapper_wrapper!,
-#     toggle_tensorcoremath,
-#     hastensorcores,
-#     MultiLogger,
-#     multi_log
-# export get_cpusocket_temperatures, get_cpu_utilizations, get_cpu_utilization
-
-# export MonitoringResults,
-#     monitoring_start,
-#     monitoring_stop,
-#     plot_monitoring_results,
-#     savefig_monitoring_results,
-#     livemonitor_temperature,
-#     livemonitor_powerusage
-# export gpuinfo, gpuinfo_p2p_access, gpus
-# export p2p_bandwidth,
-#     p2p_bandwidth_all, p2p_bandwidth_bidirectional, p2p_bandwidth_bidirectional_all
-# export host2device_bandwidth
-# export stresstest
-# export peakflops_gpu,
-#     peakflops_gpu_fmas,
-#     peakflops_gpu_wmmas,
-#     peakflops_gpu_matmul,
-#     peakflops_gpu_matmul_graphs,
-#     peakflops_gpu_matmul_scaling
-# export theoretical_peakflops_gpu, theoretical_peakflops_gpu_tensorcores
-# export memory_bandwidth,
-#     memory_bandwidth_saxpy,
-#     memory_bandwidth_scaling,
-#     memory_bandwidth_saxpy_scaling,
-#     theoretical_memory_bandwidth
-# export save_monitoring_results, load_monitoring_results
 
 end

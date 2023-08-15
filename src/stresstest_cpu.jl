@@ -35,6 +35,7 @@ function stresstest_cpu(
     verbose && @info("Took $(round(Δt; digits=2)) seconds to run the tests.")
     return nothing
 end
+stresstest_cpu(core::Integer=getcpuid(); kwargs...) = stresstest_cpu([core]; kwargs...)
 
 function _stresstest_cpu_default_threads(ncores)
     nthreads = Threads.nthreads()
@@ -69,7 +70,7 @@ function _run_stresstests_cpu(
             @tspawnat threads[i] begin
                 core_before = getcpuid()
                 pinthread(core)
-                stresstest_cpu_kernel(; verbose, kwargs...)
+                _stresstest_cpu_kernel(; verbose, kwargs...)
                 pinthread(core_before)
             end
         end
@@ -77,15 +78,14 @@ function _run_stresstests_cpu(
         for core in cores
             core_before = getcpuid()
             pinthread(core)
-            stresstest_cpu_kernel(; verbose, kwargs...)
+            _stresstest_cpu_kernel(; verbose, kwargs...)
             pinthread(core_before)
         end
     end
     return nothing
 end
-stresstest_cpu(core::Integer=getcpuid(); kwargs...) = stresstest_cpu([core]; kwargs...)
 
-function stresstest_cpu_kernel(;
+function _stresstest_cpu_kernel(;
     duration, dtype=Float64, size=_stresstest_cpu_size_default(dtype), verbose=true
 )
     A = rand(dtype, size, size)
