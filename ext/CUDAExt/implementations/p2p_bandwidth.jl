@@ -1,5 +1,5 @@
 function p2p_bandwidth(
-    ::CUDABackend;
+    ::NVIDIABackend;
     memsize::UnitPrefixedBytes=B(40_000_000),
     nbench=5,
     verbose=true,
@@ -11,7 +11,7 @@ function p2p_bandwidth(
     dst=1,
     io::IO=stdout,
 )
-    if ngpus(CUDABackend()) < 2
+    if ngpus(NVIDIABackend()) < 2
         error("At least 2 GPUs are needed for the P2P benchmark.")
     end
     mem_src, mem_dst = alloc_mem(memsize; devs=(src, dst), dtype)
@@ -66,7 +66,7 @@ function p2p_bandwidth(
     return bw_max
 end
 
-function p2p_bandwidth_all(::CUDABackend; io::IO=stdout, verbose=false, kwargs...)
+function p2p_bandwidth_all(::NVIDIABackend; io::IO=stdout, verbose=false, kwargs...)
     ngpus = length(CUDA.devices())
     if ngpus < 2
         error("At least 2 GPUs are needed for the P2P benchmark.")
@@ -76,14 +76,14 @@ function p2p_bandwidth_all(::CUDABackend; io::IO=stdout, verbose=false, kwargs..
             nothing
         else
             p2p_bandwidth(
-                CUDABackend(); src=src, dst=dst, io=io, verbose=verbose, kwargs...
+                NVIDIABackend(); src=src, dst=dst, io=io, verbose=verbose, kwargs...
             )
         end for src in 0:(ngpus - 1), dst in 0:(ngpus - 1)
     ]
 end
 
 function p2p_bandwidth_bidirectional(
-    ::CUDABackend;
+    ::NVIDIABackend;
     memsize::UnitPrefixedBytes=B(40_000_000),
     nbench=20,
     verbose=true,
@@ -95,7 +95,7 @@ function p2p_bandwidth_bidirectional(
     repeat=100,
     io::IO=stdout,
 )
-    if ngpus(CUDABackend()) < 2
+    if ngpus(NVIDIABackend()) < 2
         error("At least 2 GPUs are needed for the P2P benchmark.")
     end
     mem_dev1, mem_dev2 = alloc_mem(memsize; dtype, devs=(dev1, dev2))
@@ -142,7 +142,7 @@ function p2p_bandwidth_bidirectional(
     return bw_max
 end
 
-function p2p_bandwidth_bidirectional_all(::CUDABackend; kwargs...)
+function p2p_bandwidth_bidirectional_all(::NVIDIABackend; kwargs...)
     ngpus = length(CUDA.devices())
     if ngpus < 2
         error("At least 2 GPUs are needed for the P2P benchmark.")
@@ -152,7 +152,7 @@ function p2p_bandwidth_bidirectional_all(::CUDABackend; kwargs...)
             nothing
         else
             p2p_bandwidth_bidirectional(
-                CUDABackend(); dev1=src, dev2=dst, verbose=false, kwargs...
+                NVIDIABackend(); dev1=src, dev2=dst, verbose=false, kwargs...
             )
         end for src in 0:(ngpus - 1), dst in 0:(ngpus - 1)
     ]

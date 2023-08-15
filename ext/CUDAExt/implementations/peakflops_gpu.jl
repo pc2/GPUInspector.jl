@@ -11,7 +11,7 @@ Estimates the theoretical peak performance of a CUDA device in TFLOP/s.
 (This method is from the CUDA backend.)
 """
 function theoretical_peakflops_gpu(
-    ::CUDABackend;
+    ::NVIDIABackend;
     device=CUDA.device(),
     tensorcores=hastensorcores(),
     dtype=tensorcores ? Float16 : Float32,
@@ -105,7 +105,7 @@ it takes to perform
 For more keyword argument options see [`peakflops_gpu_fmas`](@ref) and [`peakflops_gpu_wmmas`](@ref).
 """
 function peakflops_gpu(
-    ::CUDABackend;
+    ::NVIDIABackend;
     tensorcores=hastensorcores(),
     verbose=true,
     dtype=tensorcores ? Float16 : Float32,

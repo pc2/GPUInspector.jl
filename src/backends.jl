@@ -2,10 +2,10 @@
 abstract type Backend end
 "Indicates the absence of any GPU backends"
 struct NoBackend <: Backend end
-"Represents the CUDA backend (CUDA.jl)"
-struct CUDABackend <: Backend end
-"Represents the ROC backend (AMDGPU.jl)"
-struct ROCBackend <: Backend end
+"Represents the NVIDIA backend (CUDA.jl)"
+struct NVIDIABackend <: Backend end
+"Represents the AMD backend (AMDGPU.jl)"
+struct AMDBackend <: Backend end
 
 const BACKEND = Ref{Backend}(NoBackend())
 
@@ -22,10 +22,10 @@ function backend!(b::Backend)
     return nothing
 end
 function backend!(b::Symbol)
-    if b in (:cuda, :CUDA)
-        backend!(CUDABackend())
+    if b in (:nvidia, :NVIDIA, :cuda, :CUDA)
+        backend!(NVIDIABackend())
     elseif b in (:roc, :rocm, :ROC, :ROCM, :amd, :AMD)
-        backend!(ROCBackend())
+        backend!(AMDBackend())
     else
         throw(ArgumentError("Can't set unknown backend."))
     end
@@ -35,12 +35,12 @@ const CUDAJL_LOADED = Ref{Bool}(false)
 const AMDGPUJL_LOADED = Ref{Bool}(false)
 is_cuda_loaded() = CUDAJL_LOADED[]
 is_amdgpu_loaded() = AMDGPUJL_LOADED[]
-is_backend_loaded(::CUDABackend) = is_cuda_loaded()
-is_backend_loaded(::ROCBackend) = is_amdgpu_loaded()
+is_backend_loaded(::NVIDIABackend) = is_cuda_loaded()
+is_backend_loaded(::AMDBackend) = is_amdgpu_loaded()
 is_backend_loaded(::NoBackend) = true
 
-_backend2jlpkg(::CUDABackend) = "CUDA.jl"
-_backend2jlpkg(::ROCBackend) = "AMDGPU.jl"
+_backend2jlpkg(::NVIDIABackend) = "CUDA.jl"
+_backend2jlpkg(::AMDBackend) = "AMDGPU.jl"
 
 function check_backendpkg_loaded(b::Backend)
     if !is_backend_loaded(b)

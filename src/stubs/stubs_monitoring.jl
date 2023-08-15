@@ -22,7 +22,7 @@ See also [`monitoring_start`](@ref) and [`plot_monitoring_results`](@ref).
 monitoring_stop(; kwargs...) = monitoring_stop(backend(); kwargs...)
 monitoring_stop(::Backend; kwargs...) = not_implemented_yet()
 
-# TODO: livemonitor_... (currently only in CUDABackend)
+# TODO: livemonitor_... (currently only in NVIDIABackend)
 """
     livemonitor_something(f, duration) -> times, values
 

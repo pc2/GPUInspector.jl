@@ -23,7 +23,7 @@ using GPUInspector:
     MonitoringResults,
     _defaultylims,
     @unroll,
-    CUDABackend
+    NVIDIABackend
 
 # import stubs to implement them
 import GPUInspector: backendinfo, functional
@@ -86,7 +86,7 @@ function __init__()
     return nothing
 end
 
-function backendinfo(::CUDABackend)
+function backendinfo(::NVIDIABackend)
     # somewhat crude way to figure out which API functions are implemented :)
     funcs = String[]
     impl_dir = joinpath(@__DIR__, "implementations/")
@@ -104,7 +104,7 @@ function backendinfo(::CUDABackend)
             push!(funcs, fname)
         end
     end
-    println("Implementend API functions for CUDABackend:")
+    println("Implementend API functions for NVIDIABackend:")
     for f in funcs
         println("\t", f)
     end

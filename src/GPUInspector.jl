@@ -41,7 +41,7 @@ include("stubs/stubs_monitoring.jl")
 include("stubs/stubs_peakflops_gpu.jl")
 
 # backends
-export Backend, NoBackend, CUDABackend, ROCBackend, backend, backend!, backendinfo
+export Backend, NoBackend, NVIDIABackend, AMDBackend, backend, backend!, backendinfo
 export CUDAExt
 
 # monitoring io+plotting

@@ -1,5 +1,5 @@
 function theoretical_memory_bandwidth(
-    ::CUDABackend; device::CuDevice=CUDA.device(), verbose=true, io::IO=stdout
+    ::NVIDIABackend; device::CuDevice=CUDA.device(), verbose=true, io::IO=stdout
 )
     max_mem_clock_rate =
         CUDA.attribute(device, CUDA.CU_DEVICE_ATTRIBUTE_MEMORY_CLOCK_RATE) * 1000 # in Hz
@@ -15,7 +15,7 @@ function theoretical_memory_bandwidth(
 end
 
 function memory_bandwidth(
-    ::CUDABackend;
+    ::NVIDIABackend;
     memsize::UnitPrefixedBytes=GiB(0.5),
     dtype=Cchar,
     verbose=true,
@@ -42,7 +42,7 @@ function memory_bandwidth(
 end
 
 function memory_bandwidth_scaling(
-    ::CUDABackend;
+    ::NVIDIABackend;
     device=CUDA.device(),
     sizes=logspace(1, exp2(30), 10),
     verbose=true,
@@ -52,7 +52,7 @@ function memory_bandwidth_scaling(
     bandwidths = zeros(length(sizes))
     for (i, s) in enumerate(sizes)
         bandwidths[i] = memory_bandwidth(
-            CUDABackend(); memsize=B(s), device=device, verbose=false, kwargs...
+            NVIDIABackend(); memsize=B(s), device=device, verbose=false, kwargs...
         )
         clear_gpu_memory(device)
     end
@@ -84,7 +84,7 @@ Extra keyword arguments:
 (This method is from the CUDA backend.)
 """
 function memory_bandwidth_saxpy(
-    ::CUDABackend;
+    ::NVIDIABackend;
     device=CUDA.device(),
     size=2^20 * 10,
     nbench=10,
@@ -132,7 +132,7 @@ function _saxpy_gpu_kernel!(z, a, x, y)
 end
 
 function memory_bandwidth_saxpy_scaling(
-    ::CUDABackend;
+    ::NVIDIABackend;
     device=CUDA.device(),
     sizes=[2^20 * i for i in 10:10:300],
     verbose=true,
@@ -143,7 +143,7 @@ function memory_bandwidth_saxpy_scaling(
     bandwidths = zeros(length(sizes))
     for (i, s) in enumerate(sizes)
         bandwidths[i] = memory_bandwidth_saxpy(
-            CUDABackend(); device=device, size=s, verbose=false, kwargs...
+            NVIDIABackend(); device=device, size=s, verbose=false, kwargs...
         )
         clear_gpu_memory(device)
     end

@@ -1,5 +1,5 @@
 function monitoring_start(
-    ::CUDABackend; freq=1, devices=CUDA.devices(), thread=Threads.nthreads(), verbose=true
+    ::NVIDIABackend; freq=1, devices=CUDA.devices(), thread=Threads.nthreads(), verbose=true
 )
     if ismonitoring()
         error("We are already monitoring.")
@@ -56,7 +56,7 @@ Specifically, `results` is a named tuple with the following keys:
 
 (This method is from the CUDA backend.)
 """
-function monitoring_stop(::CUDABackend; verbose=true)::MonitoringResults
+function monitoring_stop(::NVIDIABackend; verbose=true)::MonitoringResults
     if ismonitoring()
         verbose && @info("Stopping monitoring and fetching results...")
         _monitoring!(false)
@@ -67,9 +67,9 @@ function monitoring_stop(::CUDABackend; verbose=true)::MonitoringResults
     end
 end
 
-function livemonitor_temperature(::CUDABackend, duration; kwargs...)
+function livemonitor_temperature(::NVIDIABackend, duration; kwargs...)
     return livemonitor_something(
-        CUDABackend(),
+        NVIDIABackend(),
         get_temperatures,
         duration;
         title="GPU Temperatures",
@@ -78,9 +78,9 @@ function livemonitor_temperature(::CUDABackend, duration; kwargs...)
     )
 end
 
-function livemonitor_powerusage(::CUDABackend, duration; kwargs...)
+function livemonitor_powerusage(::NVIDIABackend, duration; kwargs...)
     return livemonitor_something(
-        CUDABackend(),
+        NVIDIABackend(),
         get_power_usages,
         duration;
         title="GPU Power Usage",
@@ -90,7 +90,7 @@ function livemonitor_powerusage(::CUDABackend, duration; kwargs...)
 end
 
 function livemonitor_something(
-    ::CUDABackend,
+    ::NVIDIABackend,
     f::F,
     duration;
     freq=1,
