@@ -5,7 +5,7 @@ _kernel_fma_N()::Int = Int((_kernel_fma_nfmas() - 1) ÷ 3)
 
 using CUDA: i32
 "Dummy kernel doing `_kernel_fma_nfmas()` many FMAs (default: `100_000`)."
-function kernel_fma(a, b, c, out)
+function _kernel_fma(a, b, c, out)
     i = (blockIdx().x - 1i32) * blockDim().x + threadIdx().x
     @inbounds if i <= length(out)
         a_val = a[i]
@@ -28,7 +28,7 @@ function kernel_fma(a, b, c, out)
 end
 
 """
-    peakflops_gpu_fmas(; size::Integer=5_000_000, dtype=Float32, nbench=5, nkernel=5, device=CUDA.device(), verbose=true)
+    _peakflops_gpu_fmas(; size::Integer=5_000_000, dtype=Float32, nbench=5, nkernel=5, device=CUDA.device(), verbose=true)
 Tries to estimate the peak performance of a GPU in TFLOP/s by measuring the time
 it takes to perform `_kernel_fma_nfmas() * size` many FMAs on CUDA cores.
 
@@ -41,7 +41,7 @@ it takes to perform `_kernel_fma_nfmas() * size` many FMAs on CUDA cores.
 * `verbose` (default: `true`): toggle printing.
 * `io` (default: `stdout`): set the stream where the results should be printed.
 """
-function peakflops_gpu_fmas(;
+function _peakflops_gpu_fmas(;
     size::Integer=5_000_000,
     dtype=Float32,
     nbench=5,
@@ -56,7 +56,7 @@ function peakflops_gpu_fmas(;
         d_c = CUDA.rand(dtype, size)
         d_out = CUDA.zeros(dtype, size)
 
-        kernel = @cuda launch = false kernel_fma(d_a, d_b, d_c, d_out)
+        kernel = @cuda launch = false _kernel_fma(d_a, d_b, d_c, d_out)
         config = launch_configuration(kernel.fun)
         threads = min(size, config.threads)
         blocks = cld(size, threads)

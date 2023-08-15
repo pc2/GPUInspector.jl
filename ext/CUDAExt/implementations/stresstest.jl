@@ -1,33 +1,6 @@
-"""
-    stresstest(device_or_devices)
-
-Run a GPU stress test (matrix multiplication) on one or multiple GPU devices, as specified by the positional argument.
-If no argument is provided (only) the currently active GPU will be used.
-
-**Keyword arguments:**
-
-Choose one of the following (or none):
-* `duration`: stress test will take about the given time in seconds. (StressTestBatched)
-* `enforced_duration`: stress test will take almost precisely the given time in seconds. (StressTestEnforced)
-* `approx_duration`: stress test will hopefully take approximately the given time in seconds. No promises made! (StressTestFixedIter)
-* `niter`: stress test will run the given number of matrix-multiplications, however long that will take. (StressTestFixedIter)
-* `mem`: number (`<:Real`) between 0 and 1, indicating the fraction of the available GPU memory that should be used, or a `<:UnitPrefixedBytes` indicating an absolute memory limit. (StressTestStoreResults)
-
-General settings:
-* `dtype` (default: `Float32`): element type of the matrices
-* `monitoring` (default: `false`): enable automatic monitoring, in which case a [`MonitoringResults`](@ref) object is returned.
-* `size` (default: `2048`): matrices of size `(size, size)` will be used
-* `verbose` (default: `true`): toggle printing of information
-* `parallel` (default: `true`): If `true`, will (try to) run each GPU test on a different Julia thread. Make sure to have enough Julia threads.
-* `threads` (default: `nothing`): If `parallel == true`, this argument may be used to specify the Julia threads to use.
-* `clearmem` (default: `false`): If `true`, we call [`clear_all_gpus_memory`](@ref) after the stress test.
-* `io` (default: `stdout`): set the stream where the results should be printed.
-
-When `duration` is specifiec (i.e. [`StressTestEnforced`](@ref)) there is also:
-* `batch_duration` (default: `ceil(Int, duration/10)`): desired duration of one batch of matmuls.
-"""
 function stresstest(
-    devices;
+    ::CUDABackend;
+    devices=[CUDA.device()],
     mem=nothing,
     dtype=Float32,
     verbose=true,
@@ -107,9 +80,8 @@ function stresstest(
         end
     end
 end
-stresstest(device::CuDevice=CUDA.device(); kwargs...) = stresstest([device]; kwargs...)
 
-function _default_threads(ntests)
+function _stresstest_default_threads(ntests)
     nthreads = Threads.nthreads()
     monitoring = ismonitoring()
     if nthreads >= ntests + monitoring + 1
@@ -126,7 +98,7 @@ function _default_threads(ntests)
 end
 
 function _run_stresstests(
-    tests; parallel=true, threads=_default_threads(length(tests)), verbose=true
+    tests; parallel=true, threads=_stresstest_default_threads(length(tests)), verbose=true
 )
     if parallel == true
         if length(threads) != length(tests)
@@ -142,15 +114,3 @@ function _run_stresstests(
     end
     return nothing
 end
-
-# function stresstest_on_worker(devices; verbose=true, worker=first(workers()), duration=nothing, kwargs...)
-#     verbose && @info("Using worker $worker.")
-#     # pid = withenv("JULIA_NUM_THREADS"=>length(devices)) do
-#     #     pid, = addprocs(1, exeflags = "--project=$(Base.active_project())")
-#     #     return pid
-#     # end
-
-#     t = @spawnat worker stresstest(devices; verbose=false, duration, kwargs...)
-#     monitor_temperature(duration+5; liveplot=true)
-#     return fetch(t)
-# end

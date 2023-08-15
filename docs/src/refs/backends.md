@@ -1,9 +1,9 @@
-# HDF5
+# Backends
 
 ## Index
 
 ```@index
-Pages   = ["hdf5.md"]
+Pages   = ["backends.md"]
 Order   = [:function, :type]
 ```
 
@@ -11,5 +11,5 @@ Order   = [:function, :type]
 
 ```@autodocs
 Modules = [GPUInspector]
-Pages   = ["hdf5.jl"]
+Pages   = ["backends.jl", "stubs_general.jl"]
 ```

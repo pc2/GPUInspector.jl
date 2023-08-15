@@ -1,4 +1,3 @@
-# ------------------------- Theoretical -------------------------
 """
 Estimates the theoretical peak performance of a CUDA device in TFLOP/s.
 
@@ -8,8 +7,11 @@ Estimates the theoretical peak performance of a CUDA device in TFLOP/s.
 * `device` (default: `device()`): CUDA device to be analyzed
 * `dtype` (default: `tensorcores ? Float16 : Float32`): element type of the matrices
 * `io` (default: `stdout`): set the stream where the results should be printed.
+
+(This method is from the CUDA backend.)
 """
-function theoretical_peakflops_gpu(;
+function theoretical_peakflops_gpu(
+    ::CUDABackend;
     device=CUDA.device(),
     tensorcores=hastensorcores(),
     dtype=tensorcores ? Float16 : Float32,
@@ -92,7 +94,6 @@ function _theoretical_peakflops_gpu_tensorcores(;
     return max_peakflops
 end
 
-# ------------------------- Empirical -------------------------
 """
     peakflops_gpu(; tensorcores=hastensorcores(), kwargs...)
 Tries to estimate the peak performance of a GPU in TFLOP/s by measuring the time
@@ -103,7 +104,8 @@ it takes to perform
 
 For more keyword argument options see [`peakflops_gpu_fmas`](@ref) and [`peakflops_gpu_wmmas`](@ref).
 """
-function peakflops_gpu(;
+function peakflops_gpu(
+    ::CUDABackend;
     tensorcores=hastensorcores(),
     verbose=true,
     dtype=tensorcores ? Float16 : Float32,
@@ -111,9 +113,9 @@ function peakflops_gpu(;
     kwargs...,
 )
     if tensorcores
-        flops = peakflops_gpu_wmmas(; verbose=false, dtype, kwargs...)
+        flops = _peakflops_gpu_wmmas(; verbose=false, dtype, kwargs...)
     else
-        flops = peakflops_gpu_fmas(; verbose=false, dtype, kwargs...)
+        flops = _peakflops_gpu_fmas(; verbose=false, dtype, kwargs...)
     end
     if verbose
         printstyled(
