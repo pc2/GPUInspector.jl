@@ -11,7 +11,7 @@ function p2p_bandwidth(
     dst=1,
     io::IO=stdout,
 )
-    if ngpus() < 2
+    if ngpus(CUDABackend()) < 2
         error("At least 2 GPUs are needed for the P2P benchmark.")
     end
     mem_src, mem_dst = alloc_mem(memsize; devs=(src, dst), dtype)
@@ -95,7 +95,7 @@ function p2p_bandwidth_bidirectional(
     repeat=100,
     io::IO=stdout,
 )
-    if ngpus() < 2
+    if ngpus(CUDABackend()) < 2
         error("At least 2 GPUs are needed for the P2P benchmark.")
     end
     mem_dev1, mem_dev2 = alloc_mem(memsize; dtype, devs=(dev1, dev2))

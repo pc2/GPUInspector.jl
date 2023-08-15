@@ -44,7 +44,7 @@ Heavily inspired by the CUDA sample "deviceQueryDrv.cpp".
 (This method is from the CUDA backend.)
 """
 function gpuinfo(::CUDABackend, deviceid::Integer; io::IO=stdout)
-    0 <= deviceid <= ngpus() - 1 || throw(ArgumentError("Invalid device id."))
+    0 <= deviceid <= ngpus(CUDABackend()) - 1 || throw(ArgumentError("Invalid device id."))
     return gpuinfo(CuDevice(deviceid); io)
 end
 function gpuinfo(::CUDABackend, dev::CuDevice=CUDA.device(); io::IO=stdout)
@@ -216,7 +216,7 @@ end
 
 function gpuinfo_p2p_access(::CUDABackend; io::IO=stdout)
     # check p2p access
-    ndevs = ngpus()
+    ndevs = ngpus(CUDABackend())
     if ndevs <= 1
         error("Only a single GPU available.")
     else

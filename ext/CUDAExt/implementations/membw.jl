@@ -142,7 +142,7 @@ function memory_bandwidth_saxpy_scaling(
     # sizes = [2^20 * i for i in 8:128] # V100
     bandwidths = zeros(length(sizes))
     for (i, s) in enumerate(sizes)
-        bandwidths[i] = memory_bandwidth_saxpy(;
+        bandwidths[i] = memory_bandwidth_saxpy(CUDABackend();
             device=device, size=s, verbose=false, kwargs...
         )
         clear_gpu_memory(device)

@@ -65,7 +65,7 @@ function stresstest(
             verbose && @info("Will run a `StressTestStoreResults`.")
             ts = [StressTestStoreResults(dev; mem, dtype, verbose, size) for dev in devices]
         end
-        monitoring && monitoring_start(; devices=devices, verbose)
+        monitoring && monitoring_start(CUDABackend(); devices=devices, verbose)
         Δt = @elapsed _run_stresstests(ts; verbose, kwargs...)
         if clearmem
             verbose && @info("Clearing GPU memory.")
@@ -73,7 +73,7 @@ function stresstest(
         end
         verbose && @info("Took $(round(Δt; digits=2)) seconds to run the tests.")
         if monitoring
-            results = monitoring_stop(; verbose)
+            results = monitoring_stop(CUDABackend(); verbose)
             return results
         else
             return nothing
