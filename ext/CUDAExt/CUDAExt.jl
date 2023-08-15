@@ -11,6 +11,7 @@ using LinearAlgebra
 
 # pkgs
 using UnicodePlots
+using NVTX
 
 # for usage in CUDAExt
 using GPUInspector:
@@ -21,7 +22,8 @@ using GPUInspector:
     _get_monitoring_task,
     MonitoringResults,
     _defaultylims,
-    @unroll
+    @unroll,
+    CUDABackend
 
 # import stubs to implement them
 import GPUInspector: backendinfo, functional
