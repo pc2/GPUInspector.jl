@@ -1,4 +1,4 @@
-function functional(::CUDABackend; verbose=true)
+function functional(::NVIDIABackend; verbose=true)
     if CUDA.functional()
         verbose && @info("CUDA/GPU available.")
         hascuda = true

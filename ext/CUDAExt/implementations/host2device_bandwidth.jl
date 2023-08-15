@@ -1,4 +1,4 @@
-function host2device_bandwidth(::CUDABackend;
+function host2device_bandwidth(::NVIDIABackend;
     memsize::UnitPrefixedBytes=GiB(0.5),
     dtype=Cchar,
     DtoDfactor=true,

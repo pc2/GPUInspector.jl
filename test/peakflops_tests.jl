@@ -13,11 +13,11 @@ end
     @test typeof(peakflops_gpu(; dtype=Float16, verbose=false, tensorcores=true)) == Float64
 end
 
-@testitem "_peakflops_gpu_matmul / scaling" begin
+@testitem "peakflops_gpu_matmul / scaling" begin
     using CUDA
-    @test typeof(CUDAExt._peakflops_gpu_matmul(; verbose=false)) == Float64
-    @test typeof(CUDAExt._peakflops_gpu_matmul(; size=1024, dtype=Float64, verbose=false)) == Float64
-    @test typeof(CUDAExt._peakflops_gpu_matmul(; nmatmuls=2, nbench=2, verbose=false)) == Float64
-    @test typeof(CUDAExt._peakflops_gpu_matmul_scaling(; verbose=false)) ==
+    @test typeof(CUDAExt.peakflops_gpu_matmul(; verbose=false)) == Float64
+    @test typeof(CUDAExt.peakflops_gpu_matmul(; size=1024, dtype=Float64, verbose=false)) == Float64
+    @test typeof(CUDAExt.peakflops_gpu_matmul(; nmatmuls=2, nbench=2, verbose=false)) == Float64
+    @test typeof(CUDAExt.peakflops_gpu_matmul_scaling(; verbose=false)) ==
         Tuple{Vector{Int64},Vector{Float64}}
 end

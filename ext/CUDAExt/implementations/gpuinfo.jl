@@ -1,6 +1,6 @@
-ngpus(::CUDABackend) = length(CUDA.devices())
+ngpus(::NVIDIABackend) = length(CUDA.devices())
 
-function gpus(::CUDABackend; io::IO=stdout)
+function gpus(::NVIDIABackend; io::IO=stdout)
     # Based on https://github.com/JuliaGPU/CUDA.jl/blob/ca77d1828f3bc0df34501de848c7a13f1df0b1fe/src/utilities.jl#L69
     devs = devices()
     if isempty(devs)
@@ -43,11 +43,11 @@ Heavily inspired by the CUDA sample "deviceQueryDrv.cpp".
 
 (This method is from the CUDA backend.)
 """
-function gpuinfo(::CUDABackend, deviceid::Integer; io::IO=stdout)
-    0 <= deviceid <= ngpus(CUDABackend()) - 1 || throw(ArgumentError("Invalid device id."))
+function gpuinfo(::NVIDIABackend, deviceid::Integer; io::IO=stdout)
+    0 <= deviceid <= ngpus(NVIDIABackend()) - 1 || throw(ArgumentError("Invalid device id."))
     return gpuinfo(CuDevice(deviceid); io)
 end
-function gpuinfo(::CUDABackend, dev::CuDevice=CUDA.device(); io::IO=stdout)
+function gpuinfo(::NVIDIABackend, dev::CuDevice=CUDA.device(); io::IO=stdout)
     # query
     mp = nmultiprocessors(dev)
     cores = ncudacores(dev)
@@ -214,9 +214,9 @@ function gpuinfo(::CUDABackend, dev::CuDevice=CUDA.device(); io::IO=stdout)
     return nothing
 end
 
-function gpuinfo_p2p_access(::CUDABackend; io::IO=stdout)
+function gpuinfo_p2p_access(::NVIDIABackend; io::IO=stdout)
     # check p2p access
-    ndevs = ngpus(CUDABackend())
+    ndevs = ngpus(NVIDIABackend())
     if ndevs <= 1
         error("Only a single GPU available.")
     else
