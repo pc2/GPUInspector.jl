@@ -1,4 +1,6 @@
-ngpus(::NVIDIABackend) = length(CUDA.devices())
+function ngpus(::NVIDIABackend)
+    length(CUDA.devices())
+end
 
 function gpus(::NVIDIABackend; io::IO=stdout)
     # Based on https://github.com/JuliaGPU/CUDA.jl/blob/ca77d1828f3bc0df34501de848c7a13f1df0b1fe/src/utilities.jl#L69

@@ -54,7 +54,7 @@ function memory_bandwidth_scaling(
         bandwidths[i] = memory_bandwidth(
             NVIDIABackend(); memsize=B(s), device=device, verbose=false, kwargs...
         )
-        clear_gpu_memory(device)
+        clear_gpu_memory(NVIDIABackend(); device=device)
     end
     if verbose
         peak_val, idx = findmax(bandwidths)
@@ -145,7 +145,7 @@ function memory_bandwidth_saxpy_scaling(
         bandwidths[i] = memory_bandwidth_saxpy(
             NVIDIABackend(); device=device, size=s, verbose=false, kwargs...
         )
-        clear_gpu_memory(device)
+        clear_gpu_memory(NVIDIABackend(); device=device)
     end
     if verbose
         peak_val, idx = findmax(bandwidths)

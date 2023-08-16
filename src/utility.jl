@@ -2,6 +2,15 @@ function logspace(start, stop, length)
     return exp2.(range(log2(start), log2(stop); length=length))
 end
 
+"Reclaim the unused memory of all available GPUs."
+function clear_all_gpus_memory(; gc=true, devices)
+    gc && GC.gc()
+    for dev in devices
+        clear_gpu_memory(; device=dev, gc=false)
+    end
+    return nothing
+end
+
 # L2_cachesize() = cachesize()[2]
 
 # """

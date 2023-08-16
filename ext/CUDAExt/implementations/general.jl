@@ -21,3 +21,11 @@ function functional(::NVIDIABackend; verbose=true)
     end
     return hascuda
 end
+
+function clear_gpu_memory(::NVIDIABackend; device=CUDA.device(), gc=true)
+    device!(device) do
+        gc && GC.gc()
+        CUDA.reclaim()
+    end
+    return nothing
+end
