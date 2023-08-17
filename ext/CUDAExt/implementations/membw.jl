@@ -1,4 +1,4 @@
-function theoretical_memory_bandwidth(
+function GPUInspector.theoretical_memory_bandwidth(
     ::NVIDIABackend; device::CuDevice=CUDA.device(), verbose=true, io::IO=stdout
 )
     max_mem_clock_rate =
@@ -14,7 +14,7 @@ function theoretical_memory_bandwidth(
     return max_bw
 end
 
-function memory_bandwidth(
+function GPUInspector.memory_bandwidth(
     ::NVIDIABackend;
     memsize::UnitPrefixedBytes=GiB(0.5),
     dtype=Cchar,
@@ -41,7 +41,7 @@ function memory_bandwidth(
     end
 end
 
-function memory_bandwidth_scaling(
+function GPUInspector.memory_bandwidth_scaling(
     ::NVIDIABackend;
     device=CUDA.device(),
     sizes=logspace(1, exp2(30), 10),
@@ -81,9 +81,9 @@ end
 Extra keyword arguments:
 * `cublas` (default: `true`): toggle between `CUDA.axpy!` and a custom `_saxpy_gpu_kernel!`.
 
-(This method is from the CUDA backend.)
+(This method is from the NVIDIA Backend.)
 """
-function memory_bandwidth_saxpy(
+function GPUInspector.memory_bandwidth_saxpy(
     ::NVIDIABackend;
     device=CUDA.device(),
     size=2^20 * 10,
@@ -131,7 +131,7 @@ function _saxpy_gpu_kernel!(z, a, x, y)
     return nothing
 end
 
-function memory_bandwidth_saxpy_scaling(
+function GPUInspector.memory_bandwidth_saxpy_scaling(
     ::NVIDIABackend;
     device=CUDA.device(),
     sizes=[2^20 * i for i in 10:10:300],

@@ -9,8 +9,7 @@ using Base: UUID
 using Pkg: Pkg
 
 # external
-using Reexport
-@reexport using ThreadPinning
+using ThreadPinning
 using DocStringExtensions
 using UnicodePlots
 using CpuId: cachesize
@@ -42,7 +41,7 @@ include("stubs/stubs_peakflops_gpu.jl")
 
 # backends
 export Backend, NoBackend, NVIDIABackend, AMDBackend, backend, backend!, backendinfo
-export CUDAExt
+export CUDAExt, AMDGPUExt
 
 # monitoring io+plotting
 export plot_monitoring_results, load_monitoring_results, save_monitoring_results

@@ -12,6 +12,7 @@ using LinearAlgebra
 
 # pkgs
 using UnicodePlots
+using ThreadPinning
 
 # for usage in AMDGPUExt
 using GPUInspector:
@@ -25,39 +26,7 @@ using GPUInspector:
     @unroll,
     AMDBackend
 
-# import stubs to implement them
-import GPUInspector: backendinfo, functional, clear_gpu_memory
-# gpuinfo
-import GPUInspector: ngpus, gpuinfo, gpuinfo_p2p_access, gpus
-# p2p bw
-import GPUInspector:
-    p2p_bandwidth,
-    p2p_bandwidth_all,
-    p2p_bandwidth_bidirectional,
-    p2p_bandwidth_bidirectional_all
-# host2device bw
-import GPUInspector: host2device_bandwidth
-# membw
-import GPUInspector:
-    theoretical_memory_bandwidth,
-    memory_bandwidth,
-    memory_bandwidth_scaling,
-    memory_bandwidth_saxpy,
-    memory_bandwidth_saxpy_scaling
-# stresstest
-import GPUInspector: stresstest
-# monitoring
-import GPUInspector:
-    monitoring_start,
-    monitoring_stop,
-    livemonitor_something,
-    livemonitor_powerusage,
-    livemonitor_temperature
-# peakflops_gpu
-import GPUInspector: peakflops_gpu, theoretical_peakflops_gpu
-
-# include("cuda_wrappers.jl")
-# include("utility.jl")
+include("utility.jl")
 # include("stresstests.jl")
 # include("peakflops_gpu_fmas.jl")
 # include("peakflops_gpu_wmmas.jl")

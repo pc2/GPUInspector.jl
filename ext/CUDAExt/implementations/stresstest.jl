@@ -1,4 +1,4 @@
-function stresstest(
+function GPUInspector.stresstest(
     ::NVIDIABackend;
     devices=[CUDA.device()],
     mem=nothing,

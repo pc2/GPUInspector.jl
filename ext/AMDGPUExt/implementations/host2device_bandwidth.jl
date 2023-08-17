@@ -1,4 +1,4 @@
-function host2device_bandwidth(
+function GPUInspector.host2device_bandwidth(
     ::AMDBackend;
     memsize::UnitPrefixedBytes=GiB(0.5),
     dtype=Cchar,

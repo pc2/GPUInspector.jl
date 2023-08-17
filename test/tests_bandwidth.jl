@@ -1,14 +1,13 @@
-@testitem "p2p_bandwidth" begin
-    using LinearAlgebra
-    using CUDA
-
+@testset "p2p_bandwidth" begin
     @testset "unidirectional" begin
         # p2p_bandwidth
         @test typeof(p2p_bandwidth(; verbose=false)) == Float64
         @test 0 ≤ p2p_bandwidth(; verbose=false)
         # options
         @test typeof(p2p_bandwidth(; memsize=MB(100), verbose=false)) == Float64
-        @test typeof(p2p_bandwidth(; src=CuDevice(0), dst=CuDevice(1), verbose=false)) ==
+        dev_src = GPUInspector.devices()[1]
+        dev_dst = GPUInspector.devices()[2]
+        @test typeof(p2p_bandwidth(; src=dev_src, dst=dev_dst, verbose=false)) ==
             Float64
         @test typeof(p2p_bandwidth(; dtype=Float16, verbose=false)) == Float64
         @test typeof(p2p_bandwidth(; nbench=10, verbose=false)) == Float64
@@ -41,15 +40,13 @@
     end
 end
 
-@testitem "host2device_bandwidth" begin
-    using CUDA
+@testset "host2device_bandwidth" begin
     @test isnothing(host2device_bandwidth())
     @test isnothing(host2device_bandwidth(; memsize=MB(100)))
     @test isnothing(host2device_bandwidth(; dtype=Float16))
 end
 
-@testitem "memory_bandwidth" begin
-    using CUDA
+@testset "memory_bandwidth" begin
     @test typeof(memory_bandwidth()) == Float64
     @test typeof(memory_bandwidth(; memsize=MiB(10))) == Float64
     @test typeof(memory_bandwidth(; dtype=Float32)) == Float64

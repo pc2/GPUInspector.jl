@@ -1,5 +1,5 @@
-@testitem "CUDA backend" begin
-    using CUDA
+@testset "Backend switching" begin
+    @test GPUInspector.is_cuda_loaded()
     @test GPUInspector.is_cuda_loaded()
     @test GPUInspector.is_backend_loaded(NVIDIABackend())
     @test backend() == NVIDIABackend()

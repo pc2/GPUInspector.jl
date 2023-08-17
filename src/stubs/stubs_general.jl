@@ -12,3 +12,11 @@ Reclaim the unused memory of a GPU
 """
 clear_gpu_memory(; kwargs...) = clear_gpu_memory(backend(); kwargs...)
 clear_gpu_memory(::Backend; kwargs...) = not_implemented_yet()
+
+"Return the current device of the active backend."
+device() = device(backend())
+device(::Backend) = not_implemented_yet()
+
+"Return the devices of the active backend."
+devices() = devices(backend())
+devices(::Backend) = not_implemented_yet()

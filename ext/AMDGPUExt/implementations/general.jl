@@ -1,4 +1,4 @@
-function functional(::AMDBackend; verbose=true)
+function GPUInspector.functional(::AMDBackend; verbose=true)
     if AMDGPU.functional()
         verbose && @info("AMDGPU.jl is functional.")
         working = true
@@ -9,10 +9,13 @@ function functional(::AMDBackend; verbose=true)
     return working
 end
 
-function clear_gpu_memory(::AMDBackend; device=AMDGPU.device(), gc=true)
+function GPUInspector.clear_gpu_memory(::AMDBackend; device=AMDGPU.device(), gc=true)
     device!(device) do
         gc && GC.gc()
         AMDGPU.HIP.reclaim()
     end
     return nothing
 end
+
+GPUInspector.device(::AMDBackend) = AMDGPU.device()
+GPUInspector.devices(::AMDBackend) = AMDGPU.devices()

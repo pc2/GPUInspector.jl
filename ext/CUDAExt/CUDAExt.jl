@@ -12,6 +12,7 @@ using LinearAlgebra
 # pkgs
 using UnicodePlots
 using NVTX
+using ThreadPinning
 
 # for usage in CUDAExt
 using GPUInspector:
@@ -24,37 +25,6 @@ using GPUInspector:
     _defaultylims,
     @unroll,
     NVIDIABackend
-
-# import stubs to implement them
-import GPUInspector: backendinfo, functional
-# gpuinfo
-import GPUInspector: ngpus, gpuinfo, gpuinfo_p2p_access, gpus
-# p2p bw
-import GPUInspector:
-    p2p_bandwidth,
-    p2p_bandwidth_all,
-    p2p_bandwidth_bidirectional,
-    p2p_bandwidth_bidirectional_all
-# host2device bw
-import GPUInspector: host2device_bandwidth
-# membw
-import GPUInspector:
-    theoretical_memory_bandwidth,
-    memory_bandwidth,
-    memory_bandwidth_scaling,
-    memory_bandwidth_saxpy,
-    memory_bandwidth_saxpy_scaling
-# stresstest
-import GPUInspector: stresstest
-# monitoring
-import GPUInspector:
-    monitoring_start,
-    monitoring_stop,
-    livemonitor_something,
-    livemonitor_powerusage,
-    livemonitor_temperature
-# peakflops_gpu
-import GPUInspector: peakflops_gpu, theoretical_peakflops_gpu
 
 # for convenience
 const BFloat16 = CUDA.BFloat16

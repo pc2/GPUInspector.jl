@@ -14,7 +14,7 @@
 #     return max_bw
 # end
 
-function memory_bandwidth(
+function GPUInspector.memory_bandwidth(
     ::AMDBackend;
     memsize::UnitPrefixedBytes=GiB(0.5),
     dtype=Cchar,
@@ -35,7 +35,7 @@ function memory_bandwidth(
     end
 end
 
-function memory_bandwidth_scaling(
+function GPUInspector.memory_bandwidth_scaling(
     ::AMDBackend;
     device=AMDGPU.device(),
     sizes=logspace(1, exp2(30), 10),
@@ -75,7 +75,7 @@ end
 # Extra keyword arguments:
 # * `cublas` (default: `true`): toggle between `CUDA.axpy!` and a custom `_saxpy_gpu_kernel!`.
 
-# (This method is from the CUDA backend.)
+# (This method is from the NVIDIA Backend.)
 # """
 # function memory_bandwidth_saxpy(
 #     ::NVIDIABackend;
