@@ -2,7 +2,7 @@ function GPUInspector.ngpus(::AMDBackend)
     return length(AMDGPU.devices())
 end
 
-function GPUInspector.gpus(::AMDBackend; io::IO=stdout)
+function GPUInspector.gpus(::AMDBackend; io=getstdout())
     # Based on https://github.com/JuliaGPU/CUDA.jl/blob/ca77d1828f3bc0df34501de848c7a13f1df0b1fe/src/utilities.jl#L69
     devs = AMDGPU.devices()
     if isempty(devs)
@@ -32,18 +32,18 @@ Print out detailed information about the AMD GPU with the given `deviceid`.
 
 (This method is from the AMD backend.)
 """
-function GPUInspector.gpuinfo(::AMDBackend, deviceid::Integer; io::IO=stdout)
+function GPUInspector.gpuinfo(::AMDBackend, deviceid::Integer; io=getstdout())
     0 <= deviceid <= ngpus(AMDBackend()) - 1 || throw(ArgumentError("Invalid device id."))
     return gpuinfo(HIPDevice(deviceid); io)
 end
-function GPUInspector.gpuinfo(::AMDBackend, dev::HIPDevice=AMDGPU.device(); io::IO=stdout)
+function GPUInspector.gpuinfo(::AMDBackend, dev::HIPDevice=AMDGPU.device(); io=getstdout())
     # printing
     println(io, "Device: $dev \n")
     show(io, AMDGPU.HIP.properties(dev))
     return nothing
 end
 
-function GPUInspector.gpuinfo_p2p_access(::AMDBackend; io::IO=stdout)
+function GPUInspector.gpuinfo_p2p_access(::AMDBackend; io=getstdout())
     # check p2p access
     ndevs = ngpus(AMDBackend())
     if ndevs <= 1

@@ -24,7 +24,8 @@ using GPUInspector:
     MonitoringResults,
     _defaultylims,
     @unroll,
-    AMDBackend
+    AMDBackend,
+    getstdout
 
 include("utility.jl")
 # include("stresstests.jl")

@@ -4,7 +4,7 @@ function GPUInspector.host2device_bandwidth(
     dtype=Cchar,
     DtoDfactor=true,
     verbose=true,
-    io::IO=stdout,
+    io=getstdout(),
     kwargs...,
 )
     N = Int(bytes(memsize) ÷ sizeof(dtype))
@@ -36,7 +36,7 @@ function _perform_memcpy(
     stats=false,
     DtoDfactor=false,
     verbose=true,
-    io::IO=stdout,
+    io=getstdout(),
 )
     sizeof(mem1) == sizeof(mem2) || error("sizeof(mem1) != sizeof(mem2)")
     ts = zeros(nbench)

@@ -1,5 +1,5 @@
 # function theoretical_memory_bandwidth(
-#     ::NVIDIABackend; device::CuDevice=CUDA.device(), verbose=true, io::IO=stdout
+#     ::NVIDIABackend; device::CuDevice=CUDA.device(), verbose=true, io=getstdout()
 # )
 #     max_mem_clock_rate =
 #         CUDA.attribute(device, CUDA.CU_DEVICE_ATTRIBUTE_MEMORY_CLOCK_RATE) * 1000 # in Hz
@@ -21,7 +21,7 @@ function GPUInspector.memory_bandwidth(
     verbose=true,
     DtoDfactor=true,
     device=AMDGPU.device(),
-    io::IO=stdout,
+    io=getstdout(),
     kwargs...,
 )::Float64
     AMDGPU.device!(device) do
@@ -40,7 +40,7 @@ function GPUInspector.memory_bandwidth_scaling(
     device=AMDGPU.device(),
     sizes=logspace(1, exp2(30), 10),
     verbose=true,
-    io::IO=stdout,
+    io=getstdout(),
     kwargs...,
 )
     bandwidths = zeros(length(sizes))
@@ -85,7 +85,7 @@ end
 #     dtype=Float32,
 #     cublas=true,
 #     verbose=true,
-#     io::IO=stdout,
+#     io=getstdout(),
 # )::Float64
 #     device!(device) do
 #         a = dtype(pi)
@@ -130,7 +130,7 @@ end
 #     device=CUDA.device(),
 #     sizes=[2^20 * i for i in 10:10:300],
 #     verbose=true,
-#     io::IO=stdout,
+#     io=getstdout(),
 #     kwargs...,
 # )
 #     # sizes = [2^20 * i for i in 8:128] # V100

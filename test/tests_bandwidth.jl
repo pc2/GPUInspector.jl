@@ -5,10 +5,8 @@
         @test 0 ≤ p2p_bandwidth(; verbose=false)
         # options
         @test typeof(p2p_bandwidth(; memsize=MB(100), verbose=false)) == Float64
-        dev_src = GPUInspector.devices()[1]
-        dev_dst = GPUInspector.devices()[2]
-        @test typeof(p2p_bandwidth(; src=dev_src, dst=dev_dst, verbose=false)) ==
-            Float64
+        dev_src, dev_dst = collect(GPUInspector.devices())[1:2]
+        @test typeof(p2p_bandwidth(; src=dev_src, dst=dev_dst, verbose=false)) == Float64
         @test typeof(p2p_bandwidth(; dtype=Float16, verbose=false)) == Float64
         @test typeof(p2p_bandwidth(; nbench=10, verbose=false)) == Float64
         @test typeof(p2p_bandwidth(; hist=true, verbose=true)) == Float64
@@ -25,7 +23,8 @@
         @test typeof(p2p_bandwidth_bidirectional(; verbose=false)) == Float64
         @test 0 ≤ p2p_bandwidth_bidirectional(; verbose=false)
         # options
-        @test typeof(p2p_bandwidth_bidirectional(; memsize=MB(100), verbose=false)) == Float64
+        @test typeof(p2p_bandwidth_bidirectional(; memsize=MB(100), verbose=false)) ==
+            Float64
         @test typeof(p2p_bandwidth_bidirectional(; dtype=Float16, verbose=false)) == Float64
         @test typeof(p2p_bandwidth_bidirectional(; nbench=10, verbose=false)) == Float64
         @test typeof(p2p_bandwidth_bidirectional(; hist=true, verbose=true)) == Float64

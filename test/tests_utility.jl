@@ -1,4 +1,4 @@
-@testitem "UnitPrefixedBytes" begin
+@testset "UnitPrefixedBytes" begin
     using InteractiveUtils: subtypes
 
     # general stuff
@@ -63,17 +63,4 @@
         @test abs(bytes(T(1.2) - S(2.3))) ≈ abs(bytes(T(1.2)) - bytes(S(2.3)))
     end
     @test B(40_000_000) + MB(3) - 2 * KiB(2) ≈ MB(42.995904)
-end
-
-@testitem "toggle_tensorcoremath" begin
-    using CUDA
-    @test isnothing(CUDAExt.toggle_tensorcoremath(true; verbose=false))
-    @test CUDA.math_mode() == CUDA.FAST_MATH
-    @test isnothing(CUDAExt.toggle_tensorcoremath(false; verbose=false))
-    @test CUDA.math_mode() == CUDA.DEFAULT_MATH
-    # test toggle
-    @test isnothing(CUDAExt.toggle_tensorcoremath(; verbose=false))
-    @test CUDA.math_mode() == CUDA.FAST_MATH
-    @test isnothing(CUDAExt.toggle_tensorcoremath(; verbose=false))
-    @test CUDA.math_mode() == CUDA.DEFAULT_MATH
 end

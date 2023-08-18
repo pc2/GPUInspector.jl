@@ -12,7 +12,7 @@ function GPUInspector.stresstest(
     clearmem=false,
     monitoring=false,
     batch_duration=nothing,
-    io::IO=stdout,
+    io=getstdout(),
     kwargs...,
 )
     logger = ConsoleLogger(io)
@@ -69,7 +69,7 @@ function GPUInspector.stresstest(
         Δt = @elapsed _run_stresstests(ts; verbose, kwargs...)
         if clearmem
             verbose && @info("Clearing GPU memory.")
-            clear_all_gpus_memory(devices)
+            GPUInspector.clear_all_gpus_memory(; devices=devices)
         end
         verbose && @info("Took $(round(Δt; digits=2)) seconds to run the tests.")
         if monitoring

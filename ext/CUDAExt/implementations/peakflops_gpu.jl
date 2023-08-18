@@ -16,7 +16,7 @@ function GPUInspector.theoretical_peakflops_gpu(
     tensorcores=hastensorcores(),
     dtype=tensorcores ? Float16 : Float32,
     verbose=true,
-    io::IO=stdout,
+    io=getstdout(),
 )
     if tensorcores
         max_peakflops = _theoretical_peakflops_gpu_tensorcores(; device, dtype)
@@ -109,7 +109,7 @@ function GPUInspector.peakflops_gpu(
     tensorcores=hastensorcores(),
     verbose=true,
     dtype=tensorcores ? Float16 : Float32,
-    io::IO=stdout,
+    io=getstdout(),
     kwargs...,
 )
     if tensorcores

@@ -16,6 +16,9 @@ using CpuId: cachesize
 using HDF5: h5open
 using Glob: glob
 
+const DEFAULT_IO = Ref{Union{IO, Nothing}}(nothing)
+getstdout() = something(DEFAULT_IO[], stdout)
+
 include("backends.jl")
 include("UnitPrefixedBytes.jl")
 include("utility.jl")

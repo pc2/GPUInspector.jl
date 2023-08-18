@@ -24,7 +24,8 @@ using GPUInspector:
     MonitoringResults,
     _defaultylims,
     @unroll,
-    NVIDIABackend
+    NVIDIABackend,
+    getstdout
 
 # for convenience
 const BFloat16 = CUDA.BFloat16

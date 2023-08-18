@@ -48,7 +48,7 @@ function _peakflops_gpu_fmas(;
     nkernel=5,
     device::CuDevice=CUDA.device(),
     verbose=true,
-    io::IO=stdout,
+    io=getstdout(),
 )
     device!(device) do
         d_a = CUDA.rand(dtype, size)

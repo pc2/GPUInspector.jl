@@ -1,6 +1,12 @@
 using GPUInspector
 using Test
 using LinearAlgebra
+using Logging
+
+# Environment variables:
+#   - "TEST_BACKEND": can be set to manually specify a backend
+#   - "TEST_QUIET": can be set to true/false to enable/disable non-verbose testing
+#   - "TESTS": a comma separated list of test suites to run (see TEST_NAMES below)
 
 # figure out which backend to use (if both CUDA and AMDGPU are functional we use CUDA)
 if haskey(ENV, "TEST_BACKEND")
@@ -34,7 +40,9 @@ end
 backend!(TEST_BACKEND)
 @info "Running tests with the following backend: $TEST_BACKEND."
 
-const TEST_NAMES = ["bandwidth", "peakflops", "stresstest", "gpuinfo", "core"]
+const TEST_NAMES = [
+    "bandwidth", "peakflops", "stresstest", "gpuinfo", "utility", "backend_specific", "core"
+]
 if haskey(ENV, "TESTS")
     tests = split(ENV["TESTS"], ",")
     if !all(t -> t in TEST_NAMES, tests)
@@ -50,7 +58,6 @@ else
 end
 @info "Running following tests: $TARGET_TESTS."
 
-
 if "stresstest" in TARGET_TESTS
     # error if we aren't running with enough threads
     if Threads.nthreads() == 1 || (Threads.nthreads() < ngpus() + 1)
@@ -59,17 +66,35 @@ if "stresstest" in TARGET_TESTS
     end
 end
 
+quiet_testing = parse(Bool, get(ENV, "TEST_QUIET", "true"))
+if quiet_testing
+    GPUInspector.DEFAULT_IO[] = Base.BufferStream()
+    global_logger(Logging.NullLogger())
+end
+
+if "core" in TARGET_TESTS
+    include("tests_core.jl")
+end
+if "utility" in TARGET_TESTS
+    include("tests_utility.jl")
+end
 if "gpuinfo" in TARGET_TESTS
     include("tests_gpuinfo.jl")
 end
-# if "stresstest" in TARGET_TESTS
-#     include("tests_stresstest.jl")
-# end
-# if "peakflops" in TARGET_TESTS
-#     include("tests_peakflops.jl")
-# end
-# if "bandwidth" in TARGET_TESTS
-#     include("tests_bandwidth.jl")
-# end
-# include("tests_backend.jl")
-# include("tests_utility.jl")
+if "bandwidth" in TARGET_TESTS
+    include("tests_bandwidth.jl")
+end
+if "stresstest" in TARGET_TESTS
+    using CairoMakie
+    include("tests_stresstest.jl")
+end
+if "peakflops" in TARGET_TESTS
+    include("tests_peakflops.jl")
+end
+if "backend_specific" in TARGET_TESTS
+    if TEST_BACKEND == NVIDIABackend()
+        include("tests_nvidia_only.jl")
+    elseif TEST_BACKEND == AMDBackend()
+        include("tests_amd_only.jl")
+    end
+end

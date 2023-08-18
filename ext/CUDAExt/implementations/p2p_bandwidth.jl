@@ -9,7 +9,7 @@ function GPUInspector.p2p_bandwidth(
     dtype=Float32,
     src=0,
     dst=1,
-    io::IO=stdout,
+    io=getstdout(),
 )
     if ngpus(NVIDIABackend()) < 2
         error("At least 2 GPUs are needed for the P2P benchmark.")
@@ -66,7 +66,7 @@ function GPUInspector.p2p_bandwidth(
     return bw_max
 end
 
-function GPUInspector.p2p_bandwidth_all(::NVIDIABackend; io::IO=stdout, verbose=false, kwargs...)
+function GPUInspector.p2p_bandwidth_all(::NVIDIABackend; io=getstdout(), verbose=false, kwargs...)
     ngpus = length(CUDA.devices())
     if ngpus < 2
         error("At least 2 GPUs are needed for the P2P benchmark.")
@@ -93,7 +93,7 @@ function GPUInspector.p2p_bandwidth_bidirectional(
     dev1=0,
     dev2=1,
     repeat=100,
-    io::IO=stdout,
+    io=getstdout(),
 )
     if ngpus(NVIDIABackend()) < 2
         error("At least 2 GPUs are needed for the P2P benchmark.")
