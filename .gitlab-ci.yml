@@ -5,7 +5,8 @@ variables:
   JULIA_DEPOT_PATH: "/scratch/pc2-mitarbeiter/bauerc/.julia-ci"
   JULIA_NUM_THREADS: "10"
   JULIA_EXCLUSIVE: "1"
-  JULIA_1_9: "lang/JuliaHPC/1.9.2-foss-2022a-CUDA-11.7.0"
+  JULIAHPC_1_9: "lang/JuliaHPC/1.9.2-foss-2022a-CUDA-11.7.0"
+  JULIA_1_9: "lang/Julia/1.9.2-linux-x86_64"
 default:
   tags:
     - bauerc-noctua2
@@ -18,10 +19,10 @@ julia/1.9/NVIDIA:
         - "README.md"
     - when: on_success
   variables:
-    SCHEDULER_PARAMETERS: "-N 1 -n 1 -c 32 -t 00:15:00 -A pc2-mitarbeiter -p dgx --qos=devel --gres=gpu:a100:2"
+    SCHEDULER_PARAMETERS: "-N 1 -n 1 -c 32 -t 00:20:00 -A pc2-mitarbeiter -p dgx --qos=devel --gres=gpu:a100:2"
   script:
     - /bin/bash -l
-    - module load $JULIA_1_9
+    - module load $JULIAHPC_1_9
     - julia --color=yes --project=. -e 'using Pkg; Pkg.build(verbose=true); Pkg.test(; coverage = true);'
     - julia --color=yes --project=test/coverage -e 'import Pkg; Pkg.instantiate()'
     - julia --color=yes --project=test/coverage test/coverage/coverage.jl
@@ -34,7 +35,7 @@ julia/1.9/AMD:
         - "README.md"
     - when: on_success
   variables:
-    SCHEDULER_PARAMETERS: "-N 1 -n 1 -c 128 -t 00:15:00 -A pc2-mitarbeiter -p hacc --exclusive"
+    SCHEDULER_PARAMETERS: "-N 1 -n 1 -c 128 -t 00:20:00 -A pc2-mitarbeiter -p hacc --exclusive"
   script:
     - /bin/bash -l
     - module load $JULIA_1_9
@@ -50,10 +51,10 @@ build-and-deploy-docs:
     - tags
     - external_pull_requests
   variables:
-    SCHEDULER_PARAMETERS: "-N 1 -n 1 -c 32 -t 00:15:00 -A pc2-mitarbeiter -p dgx --qos=devel --gres=gpu:a100:2"
+    SCHEDULER_PARAMETERS: "-N 1 -n 1 -c 32 -t 00:20:00 -A pc2-mitarbeiter -p dgx --qos=devel --gres=gpu:a100:2"
   script:
     - /bin/bash -l
-    - module load $JULIA_1_9
+    - module load $JULIAHPC_1_9
     - cd docs
     - julia --color=yes build_docs.jl
   allow_failure: false
