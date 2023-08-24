@@ -41,16 +41,27 @@ end
 
 @testset "host2device_bandwidth" begin
     @test isnothing(host2device_bandwidth())
-    @test isnothing(host2device_bandwidth(; memsize=MB(100)))
-    @test isnothing(host2device_bandwidth(; dtype=Float16))
+    @test isnothing(host2device_bandwidth(; memsize=MB(1)))
+    @test isnothing(host2device_bandwidth(; dtype=Float64))
 end
 
 @testset "memory_bandwidth" begin
-    @test typeof(memory_bandwidth()) == Float64
-    @test typeof(memory_bandwidth(; memsize=MiB(10))) == Float64
-    @test typeof(memory_bandwidth(; dtype=Float32)) == Float64
-
-    @test typeof(memory_bandwidth_saxpy()) == Float64
-    @test typeof(memory_bandwidth_saxpy(; size=2^20 * 2)) == Float64
-    @test typeof(memory_bandwidth_saxpy(; dtype=Float32)) == Float64
+    @testset "regular" begin
+        @test typeof(memory_bandwidth()) == Float64
+        @test typeof(memory_bandwidth(; memsize=MiB(1))) == Float64
+        @test typeof(memory_bandwidth(; dtype=Float32)) == Float64
+    end
+    @testset "regular, scaling" begin
+        @test typeof(memory_bandwidth_scaling()) ==
+            NamedTuple{(:sizes, :bandwidths),Tuple{Vector{Float64},Vector{Float64}}}
+    end
+    @testset "saxpy" begin
+        @test typeof(memory_bandwidth_saxpy()) == Float64
+        @test typeof(memory_bandwidth_saxpy(; size=2^20 * 2)) == Float64
+        @test typeof(memory_bandwidth_saxpy(; dtype=Float32)) == Float64
+    end
+    @testset "saxpy, scaling" begin
+        @test typeof(memory_bandwidth_saxpy_scaling()) ==
+            NamedTuple{(:sizes, :bandwidths),Tuple{Vector{Int64},Vector{Float64}}}
+    end
 end

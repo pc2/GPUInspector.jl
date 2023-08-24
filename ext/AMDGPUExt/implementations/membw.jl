@@ -45,7 +45,7 @@ function GPUInspector.memory_bandwidth_scaling(
 )
     bandwidths = zeros(length(sizes))
     for (i, s) in enumerate(sizes)
-        bandwidths[i] = memory_bandwidth(
+        bandwidths[i] = GPUInspector.memory_bandwidth(
             AMDBackend(); memsize=B(s), device=device, verbose=false, kwargs...
         )
         clear_gpu_memory(AMDBackend(); device=device)
@@ -71,93 +71,82 @@ function GPUInspector.memory_bandwidth_scaling(
     return (sizes=sizes, bandwidths=bandwidths)
 end
 
-# """
-# Extra keyword arguments:
-# * `cublas` (default: `true`): toggle between `CUDA.axpy!` and a custom `_saxpy_gpu_kernel!`.
+function GPUInspector.memory_bandwidth_saxpy(
+    ::AMDBackend;
+    device=AMDGPU.device(),
+    size=2^26,
+    nbench=10,
+    dtype=Float32,
+    verbose=true,
+    io=getstdout(),
+)::Float64
+    device!(device) do
+        a = dtype(pi)
+        x = AMDGPU.rand(dtype, size)
+        y = AMDGPU.rand(dtype, size)
+        z = AMDGPU.zeros(dtype, size)
 
-# (This method is from the NVIDIA Backend.)
-# """
-# function memory_bandwidth_saxpy(
-#     ::NVIDIABackend;
-#     device=CUDA.device(),
-#     size=2^20 * 10,
-#     nbench=10,
-#     dtype=Float32,
-#     cublas=true,
-#     verbose=true,
-#     io=getstdout(),
-# )::Float64
-#     device!(device) do
-#         a = dtype(pi)
-#         x = CUDA.rand(dtype, size)
-#         y = CUDA.rand(dtype, size)
-#         z = CUDA.zeros(dtype, size)
+        kernel = @roc launch = false _saxpy_gpu_kernel!(z, a, x, y)
+        occupancy = AMDGPU.launch_configuration(kernel)
+        t = Inf
+        for _ in 1:nbench
+            Δt = AMDGPU.@elapsed @roc(
+                groupsize = occupancy.groupsize, _saxpy_gpu_kernel!(z, a, x, y)
+            )
+            t = min(t, Δt)
+        end
 
-#         nthreads = CUDA.attribute(device, CUDA.DEVICE_ATTRIBUTE_MAX_THREADS_PER_BLOCK)
-#         nblocks = cld(size, nthreads)
-#         t = Inf
-#         for _ in 1:nbench
-#             if cublas
-#                 Δt = CUDA.@elapsed CUBLAS.axpy!(size, a, x, y)
-#             else
-#                 Δt = CUDA.@elapsed @cuda(
-#                     threads = nthreads, blocks = nblocks, _saxpy_gpu_kernel!(z, a, x, y)
-#                 )
-#             end
-#             t = min(t, Δt)
-#         end
+        bandwidth = 3.0 * sizeof(dtype) * size / t / (1024)^3
+        if verbose
+            printstyled(io, "Memory Bandwidth (GiB/s):\n"; bold=true)
+            print(io, " └ max: ")
+            printstyled(io, round(bandwidth; digits=2), "\n"; color=:green, bold=true)
+        end
+        return bandwidth
+    end
+end
 
-#         bandwidth = 3.0 * sizeof(dtype) * size * (1024)^(-3) / t
-#         if verbose
-#             printstyled(io, "Memory Bandwidth (GiB/s):\n"; bold=true)
-#             print(io, " └ max: ")
-#             printstyled(io, round(bandwidth; digits=2), "\n"; color=:green, bold=true)
-#         end
-#         return bandwidth
-#     end
-# end
+function _saxpy_gpu_kernel!(z, a, x, y)
+    i = (workgroupIdx().x - 1) * workgroupDim().x + workitemIdx().x
+    if i <= length(z)
+        @inbounds z[i] = a * x[i] + y[i]
+    end
+    return nothing
+end
 
-# function _saxpy_gpu_kernel!(z, a, x, y)
-#     i = (blockIdx().x - 1) * blockDim().x + threadIdx().x
-#     if i <= length(z)
-#         @inbounds z[i] = a * x[i] + y[i]
-#     end
-#     return nothing
-# end
-
-# function memory_bandwidth_saxpy_scaling(
-#     ::NVIDIABackend;
-#     device=CUDA.device(),
-#     sizes=[2^20 * i for i in 10:10:300],
-#     verbose=true,
-#     io=getstdout(),
-#     kwargs...,
-# )
-#     # sizes = [2^20 * i for i in 8:128] # V100
-#     bandwidths = zeros(length(sizes))
-#     for (i, s) in enumerate(sizes)
-#         bandwidths[i] = memory_bandwidth_saxpy(
-#             NVIDIABackend(); device=device, size=s, verbose=false, kwargs...
-#         )
-#         clear_gpu_memory(AMDBackend(); device=device)
-#     end
-#     if verbose
-#         peak_val, idx = findmax(bandwidths)
-#         peak_size = sizes[idx]
-#         p = UnicodePlots.lineplot(
-#             sizes,
-#             bandwidths;
-#             xlabel="vector length",
-#             ylabel="GiB/s",
-#             title=string(
-#                 "Peak: ", round(peak_val; digits=2), " GiB/s (size = $(bytes(peak_size)))"
-#             ),
-#             xscale=:log2,
-#         )
-#         UnicodePlots.lineplot!(p, [peak_size, peak_size], [0.0, peak_val]; color=:red)
-#         println(io) # top margin
-#         println(io, p)
-#         println(io) # bottom margin
-#     end
-#     return (sizes=sizes, bandwidths=bandwidths)
-# end
+function GPUInspector.memory_bandwidth_saxpy_scaling(
+    ::AMDBackend;
+    device=AMDGPU.device(),
+    sizes=[2^20 * i for i in 10:10:300],
+    verbose=true,
+    io=getstdout(),
+    kwargs...,
+)
+    # sizes = [2^20 * i for i in 8:128] # V100
+    bandwidths = zeros(length(sizes))
+    for (i, s) in enumerate(sizes)
+        bandwidths[i] = GPUInspector.memory_bandwidth_saxpy(
+            AMDBackend(); device=device, size=s, verbose=false, kwargs...
+        )
+        clear_gpu_memory(AMDBackend(); device=device)
+    end
+    if verbose
+        peak_val, idx = findmax(bandwidths)
+        peak_size = sizes[idx]
+        p = UnicodePlots.lineplot(
+            sizes,
+            bandwidths;
+            xlabel="vector length",
+            ylabel="GiB/s",
+            title=string(
+                "Peak: ", round(peak_val; digits=2), " GiB/s (vector size = $(bytes(peak_size)))"
+            ),
+            xscale=:log2,
+        )
+        UnicodePlots.lineplot!(p, [peak_size, peak_size], [0.0, peak_val]; color=:red)
+        println(io) # top margin
+        println(io, p)
+        println(io) # bottom margin
+    end
+    return (sizes=sizes, bandwidths=bandwidths)
+end
