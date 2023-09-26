@@ -48,7 +48,7 @@ makedocs(;
         # ],
     ],
     # assets = ["assets/custom.css", "assets/custom.js"]
-    # repo="https://git.uni-paderborn.de/pc2/julia/GPUInspector.jl/blob/{commit}{path}#{line}",
+    repo="$src/blob/{commit}{path}#{line}",
     format=Documenter.HTML(repolink="$src"; collapselevel=1, assets=["assets/favicon.ico"]),
 )
 
