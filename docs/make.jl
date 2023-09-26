@@ -1,5 +1,4 @@
 using Documenter
-using DocThemePC2
 using GPUInspector
 using CUDA
 using LinearAlgebra
@@ -8,9 +7,6 @@ BLAS.set_num_threads(1)
 
 const src = "https://github.com/pc2/GPUInspector.jl"
 const ci = get(ENV, "CI", "") == "true"
-
-@info "Preparing DocThemePC2"
-DocThemePC2.install(@__DIR__)
 
 @info "Generating Documenter.jl site"
 makedocs(;
@@ -53,7 +49,7 @@ makedocs(;
     ],
     # assets = ["assets/custom.css", "assets/custom.js"]
     # repo="https://git.uni-paderborn.de/pc2/julia/GPUInspector.jl/blob/{commit}{path}#{line}",
-    format=Documenter.HTML(; collapselevel=1, assets=["assets/favicon.ico"]),
+    format=Documenter.HTML(repolink="$src"; collapselevel=1, assets=["assets/favicon.ico"]),
 )
 
 if ci
