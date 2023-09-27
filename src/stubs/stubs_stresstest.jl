@@ -21,10 +21,10 @@ General settings:
 * `verbose` (default: `true`): toggle printing of information
 * `parallel` (default: `true`): If `true`, will (try to) run each GPU test on a different Julia thread. Make sure to have enough Julia threads.
 * `threads` (default: `nothing`): If `parallel == true`, this argument may be used to specify the Julia threads to use.
-* `clearmem` (default: `false`): If `true`, we call [`clear_all_gpus_memory`](@ref) after the stress test.
+* `clearmem` (default: `false`): If `true`, we call `clear_all_gpus_memory` after the stress test.
 * `io` (default: `stdout`): set the stream where the results should be printed.
 
-When `duration` is specifiec (i.e. [`StressTestEnforced`](@ref)) there is also:
+When `duration` is specifiec (i.e. `StressTestEnforced`) there is also:
 * `batch_duration` (default: `ceil(Int, duration/10)`): desired duration of one batch of matmuls.
 """
 stresstest(; kwargs...) = stresstest(backend(); kwargs...)

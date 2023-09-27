@@ -12,7 +12,7 @@ returns an inter-gpu memory bandwidth estimate (in GiB/s) derived from it.
 * `hist` (default: `false`): when `true`, a UnicodePlots-based histogram is printed.
 * `times` (default: `false`): toggle printing of measured times.
 * `alternate` (default: `false`): alternate `src` and `dst`, i.e. copy data back and forth.
-* `dtype` (default: `Float32`): see [`alloc_mem`](@ref).
+* `dtype` (default: `Float32`): data type to consider.
 * `io` (default: `stdout`): set the stream where the results should be printed.
 
 **Examples:**
