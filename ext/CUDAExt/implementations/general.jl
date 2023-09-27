@@ -1,4 +1,4 @@
-function functional(::NVIDIABackend; verbose=true)
+function GPUInspector.functional(::NVIDIABackend; verbose=true)
     if CUDA.functional()
         verbose && @info("CUDA/GPU available.")
         hascuda = true
@@ -21,3 +21,14 @@ function functional(::NVIDIABackend; verbose=true)
     end
     return hascuda
 end
+
+function GPUInspector.clear_gpu_memory(::NVIDIABackend; device=CUDA.device(), gc=true)
+    device!(device) do
+        gc && GC.gc()
+        CUDA.reclaim()
+    end
+    return nothing
+end
+
+GPUInspector.device(::NVIDIABackend) = CUDA.device()
+GPUInspector.devices(::NVIDIABackend) = CUDA.devices()

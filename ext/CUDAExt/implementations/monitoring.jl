@@ -1,4 +1,4 @@
-function monitoring_start(
+function GPUInspector.monitoring_start(
     ::NVIDIABackend; freq=1, devices=CUDA.devices(), thread=Threads.nthreads(), verbose=true
 )
     if ismonitoring()
@@ -54,9 +54,9 @@ Specifically, `results` is a named tuple with the following keys:
 * `time`: the (relative) times at which we measured
 * `temperature`, `power`, `compute`, `mem`
 
-(This method is from the CUDA backend.)
+(This method is from the NVIDIA Backend.)
 """
-function monitoring_stop(::NVIDIABackend; verbose=true)::MonitoringResults
+function GPUInspector.monitoring_stop(::NVIDIABackend; verbose=true)::MonitoringResults
     if ismonitoring()
         verbose && @info("Stopping monitoring and fetching results...")
         _monitoring!(false)
@@ -67,7 +67,7 @@ function monitoring_stop(::NVIDIABackend; verbose=true)::MonitoringResults
     end
 end
 
-function livemonitor_temperature(::NVIDIABackend, duration; kwargs...)
+function GPUInspector.livemonitor_temperature(::NVIDIABackend, duration; kwargs...)
     return livemonitor_something(
         NVIDIABackend(),
         get_temperatures,
@@ -78,7 +78,7 @@ function livemonitor_temperature(::NVIDIABackend, duration; kwargs...)
     )
 end
 
-function livemonitor_powerusage(::NVIDIABackend, duration; kwargs...)
+function GPUInspector.livemonitor_powerusage(::NVIDIABackend, duration; kwargs...)
     return livemonitor_something(
         NVIDIABackend(),
         get_power_usages,
@@ -89,7 +89,7 @@ function livemonitor_powerusage(::NVIDIABackend, duration; kwargs...)
     )
 end
 
-function livemonitor_something(
+function GPUInspector.livemonitor_something(
     ::NVIDIABackend,
     f::F,
     duration;

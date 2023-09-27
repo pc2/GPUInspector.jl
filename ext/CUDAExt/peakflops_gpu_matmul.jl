@@ -9,13 +9,13 @@ function peakflops_gpu_matmul_scaling(
     device=CUDA.device(),
     verbose=true,
     sizes=2 .^ (10:15),
-    io::IO=stdout,
+    io=getstdout(),
     kwargs...,
 ) where {F}
     flops = zeros(length(sizes))
     for (i, s) in enumerate(sizes)
         flops[i] = peakflops_func(; device=device, size=s, verbose=false, kwargs...)
-        clear_gpu_memory(device)
+        GPUInspector.clear_gpu_memory(; device=device)
     end
     if verbose
         peak_val, idx = findmax(flops)
@@ -64,7 +64,7 @@ function peakflops_gpu_matmul(;
     nmatmuls=5,
     nbench=5,
     verbose=true,
-    io::IO=stdout,
+    io=getstdout(),
 )
     device!(device) do
         C = CUDA.zeros(dtype, size, size)
@@ -108,7 +108,7 @@ function peakflops_gpu_matmul_graphs(;
     nmatmuls=5,
     nbench=5,
     verbose=true,
-    io::IO=stdout,
+    io=getstdout(),
 )
     device!(device) do
         C = CUDA.zeros(dtype, size, size)

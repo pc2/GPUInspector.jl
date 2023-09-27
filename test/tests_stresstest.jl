@@ -1,5 +1,4 @@
-@testitem "Stresstest: different kinds" begin
-    using CUDA
+@testset "Stresstest: different kinds" begin
     @test isnothing(stresstest(; duration=2, verbose=false))
     @test isnothing(stresstest(; enforced_duration=2, verbose=false))
     @test isnothing(stresstest(; approx_duration=2, verbose=false))
@@ -8,10 +7,9 @@
     @test isnothing(stresstest(; mem=0.2, verbose=false))
 end
 
-@testitem "Stresstest: keyword options" begin
-    using CUDA
+@testset "Stresstest: keyword options" begin
     @test isnothing(stresstest(; duration=2, verbose=false))
-    @test isnothing(stresstest(; duration=2, devices=devices(), verbose=false))
+    @test isnothing(stresstest(; duration=2, devices=GPUInspector.devices(), verbose=false))
     @test isnothing(stresstest(; duration=2, size=3000, verbose=false))
     @test isnothing(stresstest(; duration=2, dtype=Float16, verbose=false))
     @test isnothing(stresstest(; duration=2, clearmem=true, verbose=false))
@@ -19,15 +17,16 @@ end
     # TODO: kwargs: threads, parallel
 end
 
-@testitem "Stresstest: monitoring" begin
-    using CUDA
+@testset "Stresstest: monitoring" begin
     @testset "automatic (monitoring=true)" begin
         @test typeof(
-            stresstest(; devices=devices(), duration=2, verbose=false, monitoring=true)
+            stresstest(;
+                devices=GPUInspector.devices(), duration=2, verbose=false, monitoring=true
+            ),
         ) == MonitoringResults
     end
     @testset "manual" begin
-        devs = devices()
+        devs = GPUInspector.devices()
         @test isnothing(monitoring_start(; freq=1, devices=devs, verbose=false))
         @test isnothing(
             stresstest(; devices=devs, duration=2, verbose=false, monitoring=false)
@@ -41,8 +40,7 @@ end
     end
 end
 
-@testitem "Stresstest: monitoring results" begin
-    using CUDA
+@testset "Stresstest: monitoring results" begin
     @testset "MonitoringResults" begin
         r = stresstest(; duration=2, verbose=false, monitoring=true)
         @test typeof(r) == MonitoringResults
@@ -53,12 +51,13 @@ end
     end
     @testset "save / load" begin
         d = Dict{Symbol,Vector{Vector{Float64}}}()
-        ndevs = length(CUDA.devices())
+        ndevs = ngpus()
         d[:asd] = [rand(ndevs) for _ in 1:5]
         d[:qwe] = [rand(ndevs) for _ in 1:5]
         d[:jkl] = [rand(ndevs) for _ in 1:5]
         devices = Tuple{String,Base.UUID}[
-            (CUDAExt._device2string(dev), uuid(dev)) for dev in collect(CUDA.devices())
+            (CUDAExt._device2string(dev), uuid(dev)) for
+            dev in collect(GPUInspector.devices())
         ]
         r = MonitoringResults(rand(5), devices, d)
         cd(mktempdir()) do
@@ -74,8 +73,7 @@ end
     end
 end
 
-@testitem "Stresstest: monitoring results (CairoMakie)" begin
-    using CairoMakie
+@testset "Stresstest: monitoring results (CairoMakie)" begin
     r = load_monitoring_results(joinpath(@__DIR__, "test.h5"))
     @test isnothing(savefig_monitoring_results(r))
     @test isnothing(savefig_monitoring_results(r, (:compute, :mem)))

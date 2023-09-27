@@ -56,6 +56,7 @@ function check_backend(b::Backend)
 end
 
 CUDAExt::Union{Nothing,Module} = nothing
+AMDGPUExt::Union{Nothing,Module} = nothing
 
 """
 Query information about a specific backend, e.g., what functionality the backend currently

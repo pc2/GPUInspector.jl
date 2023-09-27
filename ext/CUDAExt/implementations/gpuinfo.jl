@@ -1,6 +1,8 @@
-ngpus(::NVIDIABackend) = length(CUDA.devices())
+function GPUInspector.ngpus(::NVIDIABackend)
+    length(CUDA.devices())
+end
 
-function gpus(::NVIDIABackend; io::IO=stdout)
+function GPUInspector.gpus(::NVIDIABackend; io=getstdout())
     # Based on https://github.com/JuliaGPU/CUDA.jl/blob/ca77d1828f3bc0df34501de848c7a13f1df0b1fe/src/utilities.jl#L69
     devs = devices()
     if isempty(devs)
@@ -41,13 +43,13 @@ Print out detailed information about the NVIDIA GPU with the given `deviceid`.
 
 Heavily inspired by the CUDA sample "deviceQueryDrv.cpp".
 
-(This method is from the CUDA backend.)
+(This method is from the NVIDIA Backend.)
 """
-function gpuinfo(::NVIDIABackend, deviceid::Integer; io::IO=stdout)
+function GPUInspector.gpuinfo(::NVIDIABackend, deviceid::Integer; io=getstdout())
     0 <= deviceid <= ngpus(NVIDIABackend()) - 1 || throw(ArgumentError("Invalid device id."))
     return gpuinfo(CuDevice(deviceid); io)
 end
-function gpuinfo(::NVIDIABackend, dev::CuDevice=CUDA.device(); io::IO=stdout)
+function GPUInspector.gpuinfo(::NVIDIABackend, dev::CuDevice=CUDA.device(); io=getstdout())
     # query
     mp = nmultiprocessors(dev)
     cores = ncudacores(dev)
@@ -214,7 +216,7 @@ function gpuinfo(::NVIDIABackend, dev::CuDevice=CUDA.device(); io::IO=stdout)
     return nothing
 end
 
-function gpuinfo_p2p_access(::NVIDIABackend; io::IO=stdout)
+function GPUInspector.gpuinfo_p2p_access(::NVIDIABackend; io=getstdout())
     # check p2p access
     ndevs = ngpus(NVIDIABackend())
     if ndevs <= 1

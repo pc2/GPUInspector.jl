@@ -91,7 +91,7 @@ function _peakflops_gpu_wmmas(;
     nkernel=10,
     verbose=true,
     dtype=Float16,
-    io::IO=stdout,
+    io=getstdout(),
 )
     device!(device) do
         if Symbol(dtype) == :Float16

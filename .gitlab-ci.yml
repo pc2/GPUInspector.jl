@@ -2,32 +2,45 @@ stages:
   - test
   - documentation
 variables:
-  SCHEDULER_PARAMETERS: "-N 1 -n 1 -c 32 -t 00:15:00 -A pc2-mitarbeiter -p dgx --qos=devel --gres=gpu:a100:2"
   JULIA_DEPOT_PATH: "/scratch/pc2-mitarbeiter/bauerc/.julia-ci"
   JULIA_NUM_THREADS: "10"
   JULIA_EXCLUSIVE: "1"
-  JULIA_1_9: "lang/JuliaHPC/1.9.2-foss-2022a-CUDA-11.7.0"
-  MKL_DYNAMIC: "false"
-  MKL_NUM_THREADS: "1"
+  JULIAHPC_1_9: "lang/JuliaHPC/1.9.2-foss-2022a-CUDA-11.7.0"
+  JULIA_1_9: "lang/Julia/1.9.2-linux-x86_64"
 default:
   tags:
     - bauerc-noctua2
 
 # Generates code coverage
-julia/1.9:
+julia/1.9/NVIDIA:
   stage: test
   rules:
     - changes:
         - "README.md"
     - when: on_success
+  variables:
+    SCHEDULER_PARAMETERS: "-N 1 -n 1 -c 32 -t 00:20:00 -A pc2-mitarbeiter -p dgx --qos=devel --gres=gpu:a100:2"
   script:
     - /bin/bash -l
-    - module load $JULIA_1_9
+    - module load $JULIAHPC_1_9
     - julia --color=yes --project=. -e 'using Pkg; Pkg.build(verbose=true); Pkg.test(; coverage = true);'
     - julia --color=yes --project=test/coverage -e 'import Pkg; Pkg.instantiate()'
     - julia --color=yes --project=test/coverage test/coverage/coverage.jl
   allow_failure: false
 
+julia/1.9/AMD:
+  stage: test
+  rules:
+    - changes:
+        - "README.md"
+    - when: on_success
+  variables:
+    SCHEDULER_PARAMETERS: "-N 1 -n 1 -c 128 -t 00:20:00 -A pc2-mitarbeiter -p hacc --exclusive"
+  script:
+    - /bin/bash -l
+    - module load $JULIA_1_9
+    - julia --color=yes --project=. -e 'using Pkg; Pkg.build(verbose=true); Pkg.test(; coverage = false);'
+  allow_failure: true
 
 # Documentation
 build-and-deploy-docs:
@@ -37,9 +50,11 @@ build-and-deploy-docs:
     - pushes
     - tags
     - external_pull_requests
+  variables:
+    SCHEDULER_PARAMETERS: "-N 1 -n 1 -c 32 -t 00:20:00 -A pc2-mitarbeiter -p dgx --qos=devel --gres=gpu:a100:2"
   script:
     - /bin/bash -l
-    - module load $JULIA_1_9
+    - module load $JULIAHPC_1_9
     - cd docs
     - julia --color=yes build_docs.jl
   allow_failure: false
