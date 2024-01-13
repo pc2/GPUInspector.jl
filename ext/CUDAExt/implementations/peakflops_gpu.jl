@@ -51,7 +51,7 @@ function _theoretical_peakflops_gpu_cudacores(; device, dtype)
     elseif dtype == Float64
         max_peakflops *= 1
     else
-        throw(ArgumentError("Unsupported dtype."))
+        throw(ArgumentError("Unsupported dtype $(dtype)."))
     end
     return max_peakflops
 end
@@ -60,7 +60,9 @@ function _theoretical_peakflops_gpu_tensorcores(;
     device=CUDA.device(), dtype=Float16, verbose=true
 )
     cap = CUDA.capability(device)
-    if cap == v"8.0.0"
+    if cap == v"9.0.0"
+        devtype = :Hopper
+    elseif cap == v"8.0.0"
         devtype = :A100
     elseif cap == v"7.0.0"
         devtype = :V100
@@ -70,10 +72,26 @@ function _theoretical_peakflops_gpu_tensorcores(;
     max_clock_rate = CUDA.attribute(device, CUDA.CU_DEVICE_ATTRIBUTE_CLOCK_RATE) # in kHz
     num_tensor_cores = ntensorcores(device)
     max_peakflops = max_clock_rate * num_tensor_cores * 1e-9 # in TFLOP/s
-    if devtype == :A100
+    if devtype == :Hopper
+        # matrix dimensions 8x8x4, factor 2 for nflops in A*B+C see
+        # * <https://resources.nvidia.com/en-us-tensor-core/gtc22-whitepaper-hopper> (figures 10-11)
+        # * <https://developer.nvidia.com/blog/nvidia-hopper-architecture-in-depth/> (figures 5-8)
         if Symbol(dtype) == :Float16
-            # matrix dimensions 8x8x4, factor 2 for nflops in A*B+C
-            # see e.g. https://peerj.com/articles/cs-330.pdf
+            max_peakflops *= 2 * 16 * 8 * 4 # XXX: Wrong result!
+        elseif Symbol(dtype) in (:Float32, :TensorFloat32, :TF32)
+            max_peakflops *= 2 * 8 * 8 * 4 # XXX: Wrong result!
+        elseif Symbol(dtype) == :Float64
+            max_peakflops *= 2 * 4 * 4 * 2
+        elseif Symbol(dtype) == :Int8
+            max_peakflops *= 2 * 2 * 32 * 8 * 4 # XXX: Wrong result!
+        else
+            throw(ArgumentError("Unsupported dtype $(dtype)."))
+        end
+    elseif devtype == :A100
+        if Symbol(dtype) == :Float16
+            # matrix dimensions 8x8x4, factor 2 for nflops in A*B+C see
+            # e.g. <https://doi.org/10.7717/peerj-cs.330> or
+            # <https://www.nvidia.com/content/dam/en-zz/Solutions/Data-Center/nvidia-ampere-architecture-whitepaper.pdf>
             max_peakflops *= 2 * 8 * 8 * 4
         elseif Symbol(dtype) in (:Float32, :TensorFloat32, :TF32)
             max_peakflops *= 2 * 4 * 8 * 4
@@ -82,13 +100,13 @@ function _theoretical_peakflops_gpu_tensorcores(;
         elseif Symbol(dtype) == :Int8
             max_peakflops *= 2 * 2 * 8 * 8 * 4
         else
-            throw(ArgumentError("Unsupported dtype."))
+            throw(ArgumentError("Unsupported dtype $(dtype)."))
         end
     elseif devtype == :V100
         if Symbol(dtype) == :Float16
             max_peakflops *= 2 * 4 * 4 * 4
         else
-            throw(ArgumentError("Unsupported dtype."))
+            throw(ArgumentError("Unsupported dtype $(dtype)."))
         end
     end
     return max_peakflops
