@@ -147,7 +147,7 @@ function _peakflops_gpu_wmmas(;
             dtype_a = dtype_b = BFloat16
             dtype_c = dtype_d = Float32
         else
-            throw(ArgumentError("Unsupported dtype."))
+            throw(ArgumentError("Unsupported dtype $(dtype)."))
         end
         d_a = CUDA.rand(dtype_a, m, k)
         d_b = CUDA.rand(dtype_b, k, n)
@@ -165,7 +165,7 @@ function _peakflops_gpu_wmmas(;
         elseif Symbol(dtype) in (:BFloat16, :BF16)
             kernel = @cuda launch = false _kernel_wmma_bf16_lowlevel(d_a, d_b, d_c, d_d)
         else
-            throw(ArgumentError("Unsupported dtype."))
+            throw(ArgumentError("Unsupported dtype $(dtype)."))
         end
         warpsize = CUDA.attribute(device, CUDA.CU_DEVICE_ATTRIBUTE_WARP_SIZE)
         # @show threads
