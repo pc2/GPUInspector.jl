@@ -1,7 +1,8 @@
-module CUDAExt
+module AMDGPUExt
 
 using GPUInspector
-using CUDA
+using AMDGPU
+using AMDGPU: device, device!, devices
 
 # stdlibs etc.
 using Base: UUID
@@ -11,10 +12,9 @@ using LinearAlgebra
 
 # pkgs
 using UnicodePlots
-using NVTX
 using ThreadPinning
 
-# for usage in CUDAExt
+# for usage in AMDGPUExt
 using GPUInspector:
     logspace,
     ismonitoring,
@@ -24,40 +24,31 @@ using GPUInspector:
     MonitoringResults,
     _defaultylims,
     @unroll,
-    NVIDIABackend,
+    AMDBackend,
     getstdout
 
-# for convenience
-const BFloat16 = CUDA.BFloat16
-
-include("cuda_wrappers.jl")
 include("utility.jl")
-include("stresstests.jl")
-include("peakflops_gpu_fmas.jl")
-include("peakflops_gpu_wmmas.jl")
-include("peakflops_gpu_matmul.jl")
+# include("stresstests.jl")
+# include("peakflops_gpu_fmas.jl")
+# include("peakflops_gpu_wmmas.jl")
+# include("peakflops_gpu_matmul.jl")
 include("implementations/general.jl")
 include("implementations/gpuinfo.jl")
-include("implementations/p2p_bandwidth.jl")
+# include("implementations/p2p_bandwidth.jl")
 include("implementations/host2device_bandwidth.jl")
 include("implementations/membw.jl")
-include("implementations/stresstest.jl")
-include("implementations/monitoring.jl")
-include("implementations/peakflops_gpu.jl")
+# include("implementations/stresstest.jl")
+# include("implementations/monitoring.jl")
+# include("implementations/peakflops_gpu.jl")
 
 function __init__()
-    GPUInspector.CUDAJL_LOADED[] = true
-    GPUInspector.backend!(:cuda)
-    GPUInspector.CUDAExt = Base.get_extension(GPUInspector, :CUDAExt)
-
-    # by default, use CUDA.FAST_MATH
-    if CUDA.functional()
-        toggle_tensorcoremath(true; verbose=false)
-    end
+    GPUInspector.AMDGPUJL_LOADED[] = true
+    GPUInspector.backend!(AMDBackend())
+    GPUInspector.AMDGPUExt = Base.get_extension(GPUInspector, :AMDGPUExt)
     return nothing
 end
 
-function backendinfo(::NVIDIABackend)
+function backendinfo(::AMDBackend)
     # somewhat crude way to figure out which API functions are implemented :)
     funcs = String[]
     impl_dir = joinpath(@__DIR__, "implementations/")
@@ -75,7 +66,7 @@ function backendinfo(::NVIDIABackend)
             push!(funcs, fname)
         end
     end
-    println("Implementend API functions for NVIDIABackend:")
+    println("Implementend API functions for AMDBackend:")
     for f in funcs
         println("\t", f)
     end

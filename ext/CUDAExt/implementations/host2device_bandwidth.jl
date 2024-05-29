@@ -1,9 +1,9 @@
-function host2device_bandwidth(::NVIDIABackend;
+function GPUInspector.host2device_bandwidth(::NVIDIABackend;
     memsize::UnitPrefixedBytes=GiB(0.5),
     dtype=Cchar,
     DtoDfactor=true,
     verbose=true,
-    io::IO=stdout,
+    io=getstdout(),
     kwargs...,
 )
     N = Int(bytes(memsize) ÷ sizeof(dtype))
@@ -42,7 +42,7 @@ function _perform_memcpy(
     stats=false,
     DtoDfactor=false,
     verbose=true,
-    io::IO=stdout,
+    io=getstdout(),
 )
     NVTX.@range "host2dev: $title" begin
         sizeof(mem1) == sizeof(mem2) || error("sizeof(mem1) != sizeof(mem2)")

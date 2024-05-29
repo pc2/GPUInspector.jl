@@ -8,15 +8,15 @@ Estimates the theoretical peak performance of a CUDA device in TFLOP/s.
 * `dtype` (default: `tensorcores ? Float16 : Float32`): element type of the matrices
 * `io` (default: `stdout`): set the stream where the results should be printed.
 
-(This method is from the CUDA backend.)
+(This method is from the NVIDIA Backend.)
 """
-function theoretical_peakflops_gpu(
+function GPUInspector.theoretical_peakflops_gpu(
     ::NVIDIABackend;
     device=CUDA.device(),
     tensorcores=hastensorcores(),
     dtype=tensorcores ? Float16 : Float32,
     verbose=true,
-    io::IO=stdout,
+    io=getstdout(),
 )
     if tensorcores
         max_peakflops = _theoretical_peakflops_gpu_tensorcores(; device, dtype)
@@ -104,12 +104,12 @@ it takes to perform
 
 For more keyword argument options see [`peakflops_gpu_fmas`](@ref) and [`peakflops_gpu_wmmas`](@ref).
 """
-function peakflops_gpu(
+function GPUInspector.peakflops_gpu(
     ::NVIDIABackend;
     tensorcores=hastensorcores(),
     verbose=true,
     dtype=tensorcores ? Float16 : Float32,
-    io::IO=stdout,
+    io=getstdout(),
     kwargs...,
 )
     if tensorcores

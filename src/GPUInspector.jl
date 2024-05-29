@@ -9,13 +9,15 @@ using Base: UUID
 using Pkg: Pkg
 
 # external
-using Reexport
-@reexport using ThreadPinning
+using ThreadPinning
 using DocStringExtensions
 using UnicodePlots
 using CpuId: cachesize
 using HDF5: h5open
 using Glob: glob
+
+const DEFAULT_IO = Ref{Union{IO, Nothing}}(nothing)
+getstdout() = something(DEFAULT_IO[], stdout)
 
 include("backends.jl")
 include("UnitPrefixedBytes.jl")
@@ -27,8 +29,8 @@ include("monitoring_io.jl")
 
 function not_implemented_yet()
     return error(
-        "Not implemented yet. You either haven't loaded a backend (like CUDA.jl) yet, or" *
-        " the loaded backend doesn't provide this functionality.",
+        "Not implemented yet. You either haven't loaded a backend yet (e.g. CUDA.jl or " *
+        "AMDGPU.jl), or the loaded backend doesn't provide this functionality.",
     )
 end
 include("stubs/stubs_general.jl")
@@ -42,7 +44,7 @@ include("stubs/stubs_peakflops_gpu.jl")
 
 # backends
 export Backend, NoBackend, NVIDIABackend, AMDBackend, backend, backend!, backendinfo
-export CUDAExt
+export CUDAExt, AMDGPUExt
 
 # monitoring io+plotting
 export plot_monitoring_results, load_monitoring_results, save_monitoring_results
@@ -50,10 +52,13 @@ export plot_monitoring_results, load_monitoring_results, save_monitoring_results
 # utilities
 export UnitPrefixedBytes,
     B, KB, MB, GB, TB, KiB, MiB, GiB, TiB, bytes, simplify, change_base, value
-export logspace
+export logspace, clear_all_gpus_memory
 
 # Let's currently not export the CPU tests. After all, this is GPUInspector.jl :)
 # export stresstest_cpu
+
+# stubs general
+export clear_gpu_memory
 
 # stubs gpuinfo
 export ngpus, gpuinfo, gpuinfo_p2p_access, gpus

@@ -22,26 +22,6 @@ function alloc_mem(memsize::UnitPrefixedBytes; devs=(CUDA.device(),), dtype=Floa
     return mem_handles
 end
 
-# TODO: Maybe make API/stub?
-"Reclaim the unused memory of the currently active GPU (i.e. `device()`)."
-function clear_gpu_memory(device::CuDevice=CUDA.device(); gc=true)
-    device!(device) do
-        gc && GC.gc()
-        CUDA.reclaim()
-    end
-    return nothing
-end
-
-# TODO: Maybe make API/stub?
-"Reclaim the unused memory of all available GPUs."
-function clear_all_gpus_memory(devices=CUDA.devices(); gc=true)
-    gc && GC.gc()
-    for dev in devices
-        clear_gpu_memory(dev; gc=false)
-    end
-    return nothing
-end
-
 """
     toggle_tensorcoremath([enable::Bool; verbose=true])
 Switches the `CUDA.math_mode` between `CUDA.FAST_MATH` (`enable=true`) and `CUDA.DEFAULT_MATH` (`enable=false`).
