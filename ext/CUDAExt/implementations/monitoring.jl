@@ -42,7 +42,7 @@ function monitoring_start(
 
     # spawn monitoring
     _monitoring!(true)
-    t = @tspawnat thread _monitor(func_symbol_vec; freq, devices=devs)
+    t = ThreadPools.@tspawnat thread _monitor(func_symbol_vec; freq, devices=devs)
     _set_monitoring_task(t)
     return nothing
 end

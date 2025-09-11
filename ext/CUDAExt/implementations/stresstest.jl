@@ -105,7 +105,7 @@ function _run_stresstests(
             throw(ArgumentError("length(threads) != length(tests)"))
         end
         @sync for (i, test) in enumerate(tests)
-            @tspawnat threads[i] test(; verbose=verbose)
+            ThreadPools.@tspawnat threads[i] test(; verbose=verbose)
         end
     else
         for test in tests

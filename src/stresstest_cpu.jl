@@ -67,7 +67,7 @@ function _run_stresstests_cpu(
             if verbose
                 @info("Julia thread $(threads[i]) runs test on CPU core $(core).")
             end
-            @tspawnat threads[i] begin
+            ThreadPools.@tspawnat threads[i] begin
                 core_before = getcpuid()
                 pinthread(core)
                 _stresstest_cpu_kernel(; verbose, kwargs...)

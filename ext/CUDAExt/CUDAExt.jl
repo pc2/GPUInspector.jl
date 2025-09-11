@@ -12,6 +12,7 @@ using LinearAlgebra
 # pkgs
 using UnicodePlots
 using NVTX
+import ThreadPools
 
 # for usage in CUDAExt
 using GPUInspector:

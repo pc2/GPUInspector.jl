@@ -1,6 +1,6 @@
 function supports_get_temperature(nvml_device::NVML.Device)
     temp = Ref{UInt32}()
-    nvml_return = NVML.unsafe_nvmlDeviceGetTemperature(
+    nvml_return = NVML.unchecked_nvmlDeviceGetTemperature(
         nvml_device, CUDA.NVML.NVML_TEMPERATURE_GPU, temp
     )
     return nvml_return == NVML.NVML_SUCCESS
@@ -30,7 +30,7 @@ get_temperatures(devices=CUDA.devices()) = [get_temperature(dev) for dev in devi
 
 function supports_get_power_usage(nvml_device::NVML.Device)
     power = Ref{UInt32}()
-    nvml_return = NVML.unsafe_nvmlDeviceGetPowerUsage(nvml_device, power)
+    nvml_return = NVML.unchecked_nvmlDeviceGetPowerUsage(nvml_device, power)
     return nvml_return == NVML.NVML_SUCCESS
 end
 function supports_get_power_usage(dev::CuDevice)
@@ -56,7 +56,7 @@ get_power_usages(devices=CUDA.devices()) = [get_power_usage(dev) for dev in devi
 
 function supports_get_gpu_utilization(nvml_device::NVML.Device)
     util = Ref{NVML.nvmlUtilization_t}()
-    nvml_return = NVML.unsafe_nvmlDeviceGetUtilizationRates(nvml_device, util)
+    nvml_return = NVML.unchecked_nvmlDeviceGetUtilizationRates(nvml_device, util)
     return nvml_return == NVML.NVML_SUCCESS
 end
 function supports_get_gpu_utilization(dev::CuDevice)

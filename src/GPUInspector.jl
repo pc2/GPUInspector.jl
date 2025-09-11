@@ -16,6 +16,7 @@ using UnicodePlots
 using CpuId: cachesize
 using HDF5: h5open
 using Glob: glob
+import ThreadPools
 
 include("backends.jl")
 include("UnitPrefixedBytes.jl")
