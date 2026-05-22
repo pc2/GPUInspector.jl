@@ -11,6 +11,7 @@ using Pkg: Pkg
 # external
 using Reexport
 @reexport using ThreadPinning
+using ThreadPools
 using DocStringExtensions
 using UnicodePlots
 using CpuId: cachesize
@@ -56,7 +57,7 @@ export logspace
 # export stresstest_cpu
 
 # stubs gpuinfo
-export ngpus, gpuinfo, gpuinfo_p2p_access, gpus
+export ngpus, gpuinfo, gpuinfo_p2p_access, gpus, clear_gpu_memory, clear_all_gpus_memory
 # stubs p2p bandwidth
 export p2p_bandwidth,
     p2p_bandwidth_all, p2p_bandwidth_bidirectional, p2p_bandwidth_bidirectional_all

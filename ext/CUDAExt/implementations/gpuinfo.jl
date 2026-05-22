@@ -24,7 +24,7 @@ function gpus(::NVIDIABackend; io::IO=stdout)
             cap = capability(dev)
             mem = device!(dev) do
                 # this requires a device context, so we prefer NVML
-                (free=available_memory(), total=total_memory())
+                (free=available_memory(), total=totalmem(dev))
             end
         end
         println(

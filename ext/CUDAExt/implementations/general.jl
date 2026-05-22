@@ -3,7 +3,7 @@ function functional(::NVIDIABackend; verbose=true)
         verbose && @info("CUDA/GPU available.")
         hascuda = true
     else
-        verbose && @info("No CUDA/GPU found.")
+        verbose && @warn("No CUDA/GPU found.")
         hascuda = false
         if verbose
             # debug information
@@ -20,4 +20,22 @@ function functional(::NVIDIABackend; verbose=true)
         end
     end
     return hascuda
+end
+
+
+function clear_gpu_memory(::NVIDIABackend, device::CuDevice=CUDA.device(); gc=true)
+    device!(device) do
+        gc && GC.gc()
+        CUDA.reclaim()
+    end
+    return nothing
+end
+
+
+function clear_all_gpus_memory(::NVIDIABackend, devices=CUDA.devices(); gc=true)
+    gc && GC.gc()
+    for dev in devices
+        clear_gpu_memory(NVIDIABackend(), dev; gc=false)
+    end
+    return nothing
 end

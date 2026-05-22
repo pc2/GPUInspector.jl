@@ -2,6 +2,7 @@ module CUDAExt
 
 using GPUInspector
 using CUDA
+using ThreadPools
 
 # stdlibs etc.
 using Base: UUID
@@ -26,7 +27,7 @@ using GPUInspector:
     NVIDIABackend
 
 # import stubs to implement them
-import GPUInspector: backendinfo, functional
+import GPUInspector: backendinfo, functional, clear_gpu_memory, clear_all_gpus_memory
 # gpuinfo
 import GPUInspector: ngpus, gpuinfo, gpuinfo_p2p_access, gpus
 # p2p bw
